@@ -2675,6 +2675,18 @@ image {
     line-height: 32px;
 }
 
+/* 报告页：字母型量表（MBTI / DISC）的类型代码 */
+.report-type {
+    display: block;
+    margin: 8px 0 4px;
+    color: #5a3bce;
+    font-size: 72px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    line-height: 88px;
+    text-align: center;
+}
+
 /* 报告页：作答回顾中未作答/低权重的行 */
 .score > text {
     display: block;

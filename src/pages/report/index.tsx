@@ -3,8 +3,15 @@ import { Button, Text, View } from "@tarojs/components";
 import Taro, { useLoad } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
-import { getScale, questionScore, resolveBand, scoreAnswers, type Scale } from "../../data/scales";
+import { getScale, letterCounts, maxOptionScore, mbtiType, questionOptions, questionScore, resolveBand, scoreAnswers, topLetter, LETTER_LABELS, DISC_LABELS, type Scale } from "../../data/scales";
 import { getSession, resetSession } from "../../store/session";
+
+const MBTI_LETTERS = ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P']
+const DISC_LETTERS = ['D', 'I', 'S', 'C']
+const LETTER_ORDER = [...MBTI_LETTERS, ...DISC_LETTERS.filter((letter) => !MBTI_LETTERS.includes(letter))]
+
+const letterLabelOf = (letter: string): string => LETTER_LABELS[letter] ?? DISC_LABELS[letter] ?? letter
+
 
 const defaultDisclaimer =
   "本结果仅供自我筛查与健康教育参考，不构成医疗建议或诊断。若症状持续、加重，或影响工作、生活及人际关系，请咨询精神科、心理科或其他合格心理健康专业人员。";
@@ -40,6 +47,15 @@ export default function Report() {
   }
 
   const result = scoreAnswers(scale, answers);
+
+  /** 字母型量表（MBTI / DISC）：类型由被选中的字母计数决定，不按选项分值计分 */
+  const letterMode = scale.questions.some((question) => (question.letters?.length ?? 0) > 0);
+  const counts = letterMode ? letterCounts(scale, answers) : {};
+  const usedLetters = LETTER_ORDER.filter((letter) => (counts[letter] ?? 0) > 0);
+  const isMbti = letterMode && usedLetters.every((letter) => MBTI_LETTERS.includes(letter));
+  const isDisc = letterMode && usedLetters.every((letter) => DISC_LETTERS.includes(letter));
+  const typeCode = isMbti ? mbtiType(counts) : isDisc ? topLetter(counts, DISC_LETTERS) : '';
+
   const bandValue = scale.scoring.kind === "average" ? result.average : result.total;
   const band = resolveBand(scale.scoring.bands, bandValue);
   const tone = band?.tone ?? "calm";
@@ -58,7 +74,7 @@ export default function Report() {
   const scoreLabel = scale.scoring.kind === "average" ? "均分" : "总分";
   const maxScore = scale.questions
     .filter((question) => question.scored !== false)
-    .reduce((sum, question) => sum + Math.max(...(question.options ?? scale.options).map((option) => option.score)), 0);
+    .reduce((sum, question) => sum + Math.max(0, ...questionOptions(scale, question).map((option) => option.score)), 0);
 
   return (
     <View className="report-page">
@@ -78,7 +94,14 @@ export default function Report() {
           </Button>
         </View>
 
-        {scale.scoring.kind === "profile" ? (
+        {letterMode ? (
+          <View className="phq-summary-card phq-calm">
+            <Text className="phq-eyebrow">{isMbti ? "你的类型代码" : "你的主导类型"}</Text>
+            <Text className="report-type">{typeCode}</Text>
+            <Text className="phq-severity">{letterLabelOf(typeCode[0] ?? "")}</Text>
+            <Text className="phq-summary">{scale.scoring.profileNote ?? "本量表不计算总分，结果由各类型被选中的次数决定。"}</Text>
+          </View>
+        ) : scale.scoring.kind === "profile" ? (
           <View className="phq-summary-card phq-calm">
             <Text className="phq-eyebrow">多维剖析型量表</Text>
             <Text className="phq-severity">本量表不计算总分</Text>
@@ -108,13 +131,35 @@ export default function Report() {
           </View>
         )}
 
-        {scale.dimensions.length > 0 && (
+        {letterMode && (
+          <View className="report-card">
+            <Text className="report-section-title">各类型选择次数</Text>
+            <Text className="tiny muted">被选中次数最多的类型即你的主导倾向</Text>
+            {LETTER_ORDER.filter((letter) => (counts[letter] ?? 0) > 0 || (isMbti ? MBTI_LETTERS : DISC_LETTERS).includes(letter)).map((letter) => {
+              const value = counts[letter] ?? 0;
+              const maxValue = Math.max(1, ...Object.values(counts));
+              return (
+                <View className="score" key={letter}>
+                  <View>
+                    <Text>{letterLabelOf(letter)}</Text>
+                    <Text>{value} 次</Text>
+                  </View>
+                  <View className="bar">
+                    <View style={{ width: `${Math.round((value / maxValue) * 100)}%` }} />
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        {!letterMode && scale.dimensions.length > 0 && (
           <View className="report-card">
             <Text className="report-section-title">维度明细</Text>
             <Text className="tiny muted">各维度得分越高，表示该维度描述的特征越明显</Text>
             {scale.dimensions.map((dimension) => {
               const score = result.byDimension[dimension.key] ?? 0;
-              const dimensionMax = dimension.items.length * Math.max(...scale.options.map((option) => option.score));
+              const dimensionMax = dimension.items.length * maxOptionScore(scale);
               const percent = dimensionMax > 0 ? Math.min(100, Math.round((score / dimensionMax) * 100)) : 0;
               const dimensionBand = resolveBand(dimension.bands, score);
 
@@ -141,16 +186,20 @@ export default function Report() {
             const optionIndex = answers[index];
             const option = optionIndex === null || optionIndex === undefined
               ? undefined
-              : (question.options ?? scale.options)[optionIndex];
+              : questionOptions(scale, question)[optionIndex];
             const value = optionIndex === null || optionIndex === undefined
               ? null
               : questionScore(scale, question, optionIndex);
+
+            const letter = optionIndex === null || optionIndex === undefined
+              ? null
+              : question.letters?.[optionIndex] ?? null;
 
             return (
               <View className="score" key={question.id}>
                 <View>
                   <Text>{question.id}. {question.text}</Text>
-                  <Text>{value === null ? "未作答" : `${value} 分`}</Text>
+                  <Text>{optionIndex === null || optionIndex === undefined ? "未作答" : letter ?? `${value} 分`}</Text>
                 </View>
                 {option && <Text>{option.label}{question.reverse ? "（反向计分）" : ""}</Text>}
               </View>

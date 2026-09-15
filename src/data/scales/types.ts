@@ -64,6 +64,12 @@ export type ScaleQuestion = {
    * 设为 false 的题目仍会展示与记录作答，但不参与计分（如功能影响题）。
    */
   scored?: boolean
+  /**
+   * 各选项对应的类型字母，下标与选项一一对应。
+   * 用于 profile 型量表判定类型：MBTI 如 ['J','P']，DISC 如 ['D','S','I','C']。
+   * 这类量表的选项分值不计分，类型由被选中的字母累计得出。
+   */
+  letters?: string[]
 }
 
 /** 计分方式 */
@@ -122,8 +128,13 @@ export type Scale = {
   instructions: string[]
   /** 量表来源，如「PHQ-9 · Kroenke 等，2001」；用于报告页标注 */
   source?: string
-  /** 全部题目共用的选项集。题目自带选项时，仍须在此给出唯一选项集 */
-  options: ScaleOption[]
+  /**
+   * 量表级共享选项集。
+   * 仅在全部题目使用同一套选项时给出（多数 Likert 型量表如此）。
+   * 若各题选项不同（如 MBTI 二选一、DISC 四选一、YBOCS 每题锚点不同），
+   * 则省略此字段，改由每题的 question.options 提供，避免出现无意义的占位选项。
+   */
+  options?: ScaleOption[]
   questions: ScaleQuestion[]
   dimensions: ScaleDimension[]
   scoring: {
@@ -139,7 +150,13 @@ export type Scale = {
 
 /** 取某题实际生效的选项集 */
 export const questionOptions = (scale: Scale, question: ScaleQuestion): ScaleOption[] =>
-  question.options ?? scale.options
+  question.options ?? scale.options ?? []
+
+/** 取量表内出现的最大选项分值，用于计算满分与柱状图上限 */
+export const maxOptionScore = (scale: Scale): number => {
+  const scores = scale.questions.flatMap((question) => questionOptions(scale, question).map((option) => option.score))
+  return scores.length > 0 ? Math.max(...scores) : 0
+}
 
 /** 由题目与选项推导题目数量文案 */
 export const scaleMeta = (scale: Scale): string => `${scale.questions.length} 题 · ${scale.duration}`
@@ -150,6 +167,7 @@ export const questionScore = (scale: Scale, question: ScaleQuestion, optionIndex
   const raw = options[optionIndex]?.score ?? 0
   if (!question.reverse) return raw
   const scores = options.map((option) => option.score)
+  if (scores.length === 0) return raw
   return Math.max(...scores) + Math.min(...scores) - raw
 }
 
@@ -198,4 +216,50 @@ export const dimensionItemCount = (scale: Scale, dimensionKey: string): number =
 /** 按分界值取分级带 */
 export const resolveBand = (bands: ScaleBand[] | undefined, value: number): ScaleBand | undefined =>
   bands?.find((band) => value >= band.min && value <= band.max)
+
+/** 统计各类型字母被选中的次数。用于 MBTI / DISC 这类以字母累计判定类型的量表 */
+export const letterCounts = (scale: Scale, answers: Array<number | null>): Record<string, number> => {
+  const counts: Record<string, number> = {}
+  scale.questions.forEach((question, index) => {
+    const optionIndex = answers[index]
+    if (optionIndex === null || optionIndex === undefined) return
+    const letter = question.letters?.[optionIndex]
+    if (!letter) return
+    counts[letter] = (counts[letter] ?? 0) + 1
+  })
+  return counts
+}
+
+/** 取字母计数最高的一项；并列时按传入顺序取靠前者 */
+export const topLetter = (counts: Record<string, number>, order: string[]): string =>
+  order.reduce((best, letter) => ((counts[letter] ?? 0) > (counts[best] ?? 0) ? letter : best), order[0] ?? '')
+
+/** MBTI 四字母类型：E/I、S/N、T/F、J/P 各取计数较高的一极 */
+export const mbtiType = (counts: Record<string, number>): string =>
+  ([['E', 'I'], ['S', 'N'], ['T', 'F'], ['J', 'P']] as Array<[string, string]>)
+    .map(([first, second]) => ((counts[first] ?? 0) >= (counts[second] ?? 0) ? first : second))
+    .join('')
+
+/** 各类型字母的中文释义，报告页用于展示 */
+export const LETTER_LABELS: Record<string, string> = {
+  E: '外向 Extraversion',
+  I: '内向 Introversion',
+  S: '感觉 Sensing',
+  N: '直觉 Intuition',
+  T: '思考 Thinking',
+  F: '情感 Feeling',
+  J: '判断 Judging',
+  P: '知觉 Perceiving',
+  D: '支配 Dominance',
+  C: '谨慎 Compliance',
+}
+
+/** DISC 四型释义 */
+export const DISC_LABELS: Record<string, string> = {
+  D: '支配型 Dominance',
+  I: '影响型 Influence',
+  S: '稳健型 Steadiness',
+  C: '谨慎型 Compliance',
+}
+
 
