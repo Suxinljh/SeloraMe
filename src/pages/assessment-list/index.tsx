@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { View, Text, ScrollView } from '@tarojs/components'
 import Taro, { useLoad } from '@tarojs/taro'
 import Nav from '../../components/Nav'
-import Icon from '../../components/Icon'
+import ScaleCard from '../../components/ScaleCard'
 import { allScales, SCALE_CATEGORIES, scalesByCategory, type Scale, type ScaleCategory } from '../../data/scales'
 
 const categoryNames = SCALE_CATEGORIES.reduce<Record<string, string>>((acc, { key, name }) => {
@@ -51,20 +51,7 @@ export default function List () {
       </ScrollView>
       <View className='list'>
         {visible.map((scale) => (
-          <View className='assessment-card' key={scale.id} onClick={() => open(scale)}>
-            <View>
-              <Text className='assessment-name'>{scale.title}</Text>
-              <Text className='assessment-desc'>{scale.desc}</Text>
-              <Text className='assessment-meta'>
-                <Icon name='schedule' className='meta-icon' />
-                {scale.questions.length} 题 · {scale.duration}
-              </Text>
-            </View>
-            <View className='assessment-bottom'>
-              <Text className='tag'>{scale.tag}</Text>
-              <Text className='fee'>开始测评</Text>
-            </View>
-          </View>
+          <ScaleCard key={scale.id} scale={scale} onClick={() => open(scale)} />
         ))}
         {visible.length === 0 && <Text className='empty'>该筛选条件下暂无量表</Text>}
       </View>

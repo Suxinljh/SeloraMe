@@ -3,14 +3,15 @@ import { Input, Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import Nav from '../../components/Nav'
 import Icon from '../../components/Icon'
-import { matchRange, searchScales, type Scale } from '../../data/scales'
+import ScaleCard from '../../components/ScaleCard'
+import { searchScales, type Scale } from '../../data/scales'
 
 /**
  * 量表搜索页。
  *
  * 匹配范围只含标题与描述（见 data/scales 的 searchScales），
  * 不涉及介绍正文、分类、标签，避免结果发散。
- * 结果卡片沿用分类列表页的样式，保持视觉一致。
+ * 结果卡片复用共用的 ScaleCard，与分类列表页保持一致。
  */
 
 /**
@@ -18,19 +19,6 @@ import { matchRange, searchScales, type Scale } from '../../data/scales'
  * 这些词均已核对过能在标题或描述中命中量表，避免点进去是空结果。
  */
 const hotKeywords = ['MBTI', '霍兰德', '性格', '情绪', '焦虑', '抑郁', '职业', '依恋', '学习', '心理健康']
-
-/** 把命中片段拆成三段渲染，用于高亮 */
-function Highlighted ({ text, keyword, className }: { text: string; keyword: string; className: string }) {
-  const range = matchRange(text, keyword)
-  if (!range) return <Text className={className}>{text}</Text>
-  return (
-    <Text className={className}>
-      {text.slice(0, range.start)}
-      <Text className='search-hit'>{text.slice(range.start, range.end)}</Text>
-      {text.slice(range.end)}
-    </Text>
-  )
-}
 
 export default function Search () {
   const [keyword, setKeyword] = useState('')
@@ -83,27 +71,14 @@ export default function Search () {
 
         <View className='list'>
           {results.map((scale) => (
-            <View className='assessment-card' key={scale.id} onClick={() => open(scale)}>
-              <View>
-                <Highlighted text={scale.title} keyword={keyword} className='assessment-name' />
-                <Highlighted text={scale.desc} keyword={keyword} className='assessment-desc' />
-                <Text className='assessment-meta'>
-                  <Icon name='schedule' className='meta-icon' />
-                  {scale.questions.length} 题 · {scale.duration}
-                </Text>
-              </View>
-              <View className='assessment-bottom'>
-                <Text className='tag'>{scale.tag}</Text>
-                <Text className='fee'>开始测评</Text>
-              </View>
-            </View>
+            <ScaleCard key={scale.id} scale={scale} keyword={keyword} onClick={() => open(scale)} />
           ))}
 
           {trimmed.length > 0 && results.length === 0 && (
             <View className='search-empty'>
               <Icon name='search' className='search-empty-icon' />
               <Text className='search-empty-title'>没有找到「{trimmed}」相关的量表</Text>
-              <Text className='search-empty-hint'>换个词试试，或者到分类页浏览全部测评</Text>
+              <Text className='search-empty-hint'>换个词试试，或者到分类页浏览全部量表</Text>
             </View>
           )}
         </View>

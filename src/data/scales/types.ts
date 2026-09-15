@@ -167,6 +167,14 @@ export type Scale = {
    * 接入统计接口后可直接启用；在此之前不要填编造的数字。
    */
   participants: string
+  /**
+   * 价格文案，如「¥19.9」。**省略即表示免费**。
+   *
+   * 刻意用单一字段表达免费/收费：历史上曾出现「既标 free 又带 price」的
+   * 矛盾数据，卡片会同时显示免费与价格。现在免费量表不写此字段，从数据层面
+   * 杜绝了这种矛盾。
+   */
+  price?: string
   /** 详情页「这是个什么样的测试？」正文段落 */
   intro: string[]
   /** 详情页要点行，用「｜」分隔 */
@@ -249,5 +257,11 @@ export const DISC_LABELS: Record<string, string> = {
   S: '稳健型 Steadiness',
   C: '谨慎型 Compliance',
 }
+
+/** 是否免费。未标价即免费 */
+export const isFreeScale = (scale: Scale): boolean => !scale.price
+
+/** 卡片上展示的价格文案 */
+export const priceLabelOf = (scale: Scale): string => scale.price ?? '免费'
 
 
