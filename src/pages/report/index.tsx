@@ -3,169 +3,168 @@ import { Button, Text, View } from "@tarojs/components";
 import Taro, { useLoad } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
-import {
-  gadQuestions,
-  getGadSeverity,
-  getPhqSeverity,
-  phqImpactOptions,
-  phqQuestions,
-} from "../../data/assessments";
-import {
-  getGadSession,
-  getPhqSession,
-  resetGadSession,
-  resetPhqSession,
-} from "../../store/session";
+import { getScale, questionScore, resolveBand, scoreAnswers, type Scale } from "../../data/scales";
+import { getSession, resetSession } from "../../store/session";
 
-const phqNames = [
-  "兴趣减退",
-  "情绪低落",
-  "睡眠困扰",
-  "疲倦乏力",
-  "食欲改变",
-  "自我评价低",
-  "注意力困难",
-  "动作或坐立不安",
-  "自伤相关想法",
-];
-const gadNames = [
-  "紧张或不安",
-  "无法控制担忧",
-  "过度担心",
-  "难以放松",
-  "坐立不安",
-  "易怒或急躁",
-  "害怕不好的事发生",
-];
+const defaultDisclaimer =
+  "本结果仅供自我筛查与健康教育参考，不构成医疗建议或诊断。若症状持续、加重，或影响工作、生活及人际关系，请咨询精神科、心理科或其他合格心理健康专业人员。";
 
 export default function Report() {
-  const [assessment, setAssessment] = useState<"phq-9" | "gad">("phq-9");
-  const [phqSession, setPhqSession] = useState(getPhqSession);
-  const [gadSession, setGadSession] = useState(getGadSession);
+  const [scaleId, setScaleId] = useState("");
+  const [answers, setAnswers] = useState<Array<number | null>>([]);
+  const [completedAt, setCompletedAt] = useState<number | null>(null);
+
   useLoad((options) => {
-    if (options.assessment === "gad") {
-      setAssessment("gad");
-      setGadSession(getGadSession());
-    } else {
-      setPhqSession(getPhqSession());
-    }
+    const id = typeof options.assessment === "string" ? options.assessment : "phq-9";
+    const target = getScale(id);
+    setScaleId(id);
+    if (!target) return;
+    const session = getSession(target.id, target.questions.length);
+    setAnswers(session.answers);
+    setCompletedAt(session.completedAt);
   });
-  const gad = assessment === "gad";
-  const session = gad ? gadSession : phqSession;
-  const answers = session.answers.map((answer) => answer ?? 0);
-  const score = answers.reduce((sum, answer) => sum + answer, 0);
-  const severity = gad ? getGadSeverity(score) : getPhqSeverity(score);
-  const completed = session.completedAt
-    ? new Date(session.completedAt)
-    : new Date();
-  const time = `${completed.getFullYear()}-${String(completed.getMonth() + 1).padStart(2, "0")}-${String(completed.getDate()).padStart(2, "0")}`;
-  const names = gad ? gadNames : phqNames;
-  const questions = gad ? gadQuestions : phqQuestions;
-  const assessmentName = gad ? "GAD-7 广泛性焦虑筛查" : "PHQ-9 抑郁情绪筛查";
+
+  const scale: Scale | undefined = getScale(scaleId);
+
+  if (!scale) {
+    return (
+      <View className="report-page">
+        <Nav back />
+        <View className="report-content">
+          <View className="report-card">
+            <Text className="report-section-title">未找到该量表</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  const result = scoreAnswers(scale, answers);
+  const bandValue = scale.scoring.kind === "average" ? result.average : result.total;
+  const band = resolveBand(scale.scoring.bands, bandValue);
+  const tone = band?.tone ?? "calm";
+  const finished = completedAt ? new Date(completedAt) : new Date();
+  const time = `${finished.getFullYear()}-${String(finished.getMonth() + 1).padStart(2, "0")}-${String(finished.getDate()).padStart(2, "0")}`;
+
+  /** PHQ-9 第 9 题非 0 时的安全提示 */
+  const safetyQuestionIndex = scale.id === "phq-9" ? 8 : -1;
+  const needsSafetyNotice = safetyQuestionIndex >= 0 && (answers[safetyQuestionIndex] ?? 0) > 0;
+
   const restart = () => {
-    if (gad) resetGadSession();
-    else resetPhqSession();
-    Taro.redirectTo({ url: `/pages/questions/index?assessment=${assessment}` });
+    resetSession(scale.id, scale.questions.length);
+    Taro.redirectTo({ url: `/pages/questions/index?assessment=${scale.id}` });
   };
+
+  const scoreLabel = scale.scoring.kind === "average" ? "均分" : "总分";
+  const maxScore = scale.questions
+    .filter((question) => question.scored !== false)
+    .reduce((sum, question) => sum + Math.max(...(question.options ?? scale.options).map((option) => option.score)), 0);
+
   return (
-    <View className="report-page phq-report-page">
+    <View className="report-page">
       <Nav back />
-      <View className="report-content phq-report-content">
+      <View className="report-content">
         <View className="report-meta">
           <View>
             <Text className="report-name">
               <Icon name="psychology" className="title-icon" />
-              {assessmentName}
+              {scale.title}
             </Text>
-            <Text>完成时间：{time} · 过去两周</Text>
+            <Text>完成时间：{time} · 共 {scale.questions.length} 题</Text>
           </View>
           <Button onClick={restart}>
             <Icon name="replay" className="button-icon" />
             重新测评
           </Button>
         </View>
-        <View className={`phq-summary-card phq-${severity.tone}`}>
-          <Text className="phq-eyebrow">{gad ? "GAD-7" : "PHQ-9"} 总分</Text>
-          <View className="phq-score-line">
-            <Text className="phq-total">{score}</Text>
-            <Text className="phq-max">/ {gad ? 21 : 27} 分</Text>
+
+        {scale.scoring.kind === "profile" ? (
+          <View className="phq-summary-card phq-calm">
+            <Text className="phq-eyebrow">多维剖析型量表</Text>
+            <Text className="phq-severity">本量表不计算总分</Text>
+            <Text className="phq-summary">{scale.scoring.profileNote ?? "结果以各维度得分的组合形态呈现，请参考下方维度明细。"}</Text>
           </View>
-          <Text className="phq-severity">{severity.label}</Text>
-          <Text className="phq-range">{severity.range}</Text>
-          <Text className="phq-summary">{severity.summary}</Text>
-        </View>
-        {!gad && answers[8] > 0 && (
+        ) : (
+          <View className={`phq-summary-card phq-${tone}`}>
+            <Text className="phq-eyebrow">{scoreLabel}</Text>
+            <View className="phq-score-line">
+              <Text className="phq-total">{Math.round(bandValue * 10) / 10}</Text>
+              <Text className="phq-max">/ {maxScore} 分</Text>
+            </View>
+            <Text className="phq-severity">{band?.label ?? "已完成"}</Text>
+            {band && <Text className="phq-range">{band.summary}</Text>}
+            {band && <Text className="phq-summary">{band.recommendation}</Text>}
+            {!band && <Text className="phq-summary">该量表源文档未给出明确的分界值，因此不展示分级。可在下方查看各维度得分。</Text>}
+          </View>
+        )}
+
+        {needsSafetyNotice && (
           <View className="phq-safety-card">
             <Icon name="helpOutline" className="phq-safety-icon" />
             <View>
               <Text>请优先关注当下安全</Text>
-              <Text>
-                你在第 9
-                题选择了非“完全没有”。如果你有立即伤害自己或无法保证安全的风险，请立刻联系当地急救服务、前往最近急诊，或联系可信任的人陪伴。此结果不能替代专业风险评估。
-              </Text>
+              <Text>你在第 9 题选择了非「完全没有」。如果你有立即伤害自己或无法保证安全的风险，请立刻联系当地急救服务、前往最近急诊，或联系可信任的人陪伴。此结果不能替代专业风险评估。</Text>
             </View>
           </View>
         )}
-        <View className="report-card">
-          <Text className="report-section-title">结果解读</Text>
-          <View className="meaning purple-box">
-            <Text>
-              <Icon name="psychology" className="meaning-icon" />
-              筛查结果
-            </Text>
-            <Text>
-              {severity.summary} {gad ? "GAD-7" : "PHQ-9"}{" "}
-              是症状筛查工具，不等同于临床诊断；诊断仍需由合格专业人员结合完整访谈作出。
-            </Text>
+
+        {scale.dimensions.length > 0 && (
+          <View className="report-card">
+            <Text className="report-section-title">维度明细</Text>
+            <Text className="tiny muted">各维度得分越高，表示该维度描述的特征越明显</Text>
+            {scale.dimensions.map((dimension) => {
+              const score = result.byDimension[dimension.key] ?? 0;
+              const dimensionMax = dimension.items.length * Math.max(...scale.options.map((option) => option.score));
+              const percent = dimensionMax > 0 ? Math.min(100, Math.round((score / dimensionMax) * 100)) : 0;
+              const dimensionBand = resolveBand(dimension.bands, score);
+
+              return (
+                <View className="score" key={dimension.key}>
+                  <View>
+                    <Text>{dimension.name}</Text>
+                    <Text>{Math.round(score * 10) / 10} 分</Text>
+                  </View>
+                  <View className="bar">
+                    <View style={{ width: `${percent}%` }} />
+                  </View>
+                  {dimensionBand && <Text>{dimensionBand.label}：{dimensionBand.summary}</Text>}
+                </View>
+              );
+            })}
           </View>
-          {!gad && (
-            <View className="meaning orange-box">
-              <Text>
-                <Icon name="sentimentSatisfied" className="meaning-icon" />
-                功能影响
-              </Text>
-              <Text>
-                {phqSession.impact === null
-                  ? "尚未记录功能影响。"
-                  : `你选择了“${phqImpactOptions[phqSession.impact]}”。功能困难不计入 PHQ-9 总分，但可帮助专业人员理解症状对生活的影响。`}
-              </Text>
-            </View>
-          )}
-          <View className="meaning green-box">
-            <Text>
-              <Icon name="spa" className="meaning-icon" />
-              下一步建议
-            </Text>
-            <Text>{severity.recommendation}</Text>
-          </View>
-        </View>
+        )}
+
         <View className="report-card">
-          <Text className="report-section-title">症状维度明细</Text>
-          <Text className="tiny muted">
-            每项 0–3 分，分数越高表示该症状出现更频繁
-          </Text>
-          {names.map((name, index) => (
-            <View className="score" key={name}>
-              <View>
-                <Text>
-                  {index + 1}. {name}
-                </Text>
-                <Text>{answers[index]} / 3 分</Text>
+          <Text className="report-section-title">作答回顾</Text>
+          <Text className="tiny muted">每题按量表原始计分呈现，反向计分题已折算</Text>
+          {scale.questions.map((question, index) => {
+            const optionIndex = answers[index];
+            const option = optionIndex === null || optionIndex === undefined
+              ? undefined
+              : (question.options ?? scale.options)[optionIndex];
+            const value = optionIndex === null || optionIndex === undefined
+              ? null
+              : questionScore(scale, question, optionIndex);
+
+            return (
+              <View className="score" key={question.id}>
+                <View>
+                  <Text>{question.id}. {question.text}</Text>
+                  <Text>{value === null ? "未作答" : `${value} 分`}</Text>
+                </View>
+                {option && <Text>{option.label}{question.reverse ? "（反向计分）" : ""}</Text>}
               </View>
-              <View className="bar">
-                <View style={{ width: `${(answers[index] / 3) * 100}%` }} />
-              </View>
-              <Text>{questions[index].text}</Text>
-            </View>
-          ))}
+            );
+          })}
         </View>
+
         <View className="phq-disclaimer">
           <Text>重要提示</Text>
-          <Text>
-            本结果仅供自我筛查与健康教育参考，不构成医疗建议或诊断。若症状持续、加重，或影响工作、生活及人际关系，请咨询精神科、心理科或其他合格心理健康专业人员。
-          </Text>
+          <Text>{scale.disclaimer ?? defaultDisclaimer}</Text>
+          {scale.source && <Text>量表来源：{scale.source}</Text>}
         </View>
       </View>
+
       <View className="quiz-footer report-footer">
         <Button className="quiz-prev" onClick={restart}>
           <Icon name="replay" className="button-icon" />
@@ -173,12 +172,7 @@ export default function Report() {
         </Button>
         <Button
           className="quiz-next share"
-          onClick={() =>
-            Taro.showToast({
-              title: "报告已保存在本次测评记录中",
-              icon: "none",
-            })
-          }
+          onClick={() => Taro.showToast({ title: "报告已保存在本次测评记录中", icon: "none" })}
         >
           <Icon name="share" className="button-icon" />
           保存结果

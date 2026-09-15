@@ -3,88 +3,74 @@ import { Button, Text, View } from "@tarojs/components";
 import Taro, { useLoad } from "@tarojs/taro";
 import Icon from "../../components/Icon";
 import Nav from "../../components/Nav";
-import {
-  gadOptions,
-  gadQuestions,
-  phqImpactOptions,
-  phqOptions,
-  phqQuestions,
-} from "../../data/assessments";
-import {
-  completeGadSession,
-  completePhqSession,
-  getGadSession,
-  getPhqSession,
-  saveGadAnswer,
-  savePhqAnswer,
-  savePhqImpact,
-} from "../../store/session";
-
-type AssessmentId = "phq-9" | "gad";
-const isGad = (id: AssessmentId) => id === "gad";
+import { getScale, questionOptions, type Scale } from "../../data/scales";
+import { completeSession, getSession, saveAnswer } from "../../store/session";
 
 export default function Questions() {
-  const [assessment, setAssessment] = useState<AssessmentId>("phq-9");
+  const [scaleId, setScaleId] = useState("phq-9");
   const [step, setStep] = useState(0);
-  const [phqSession, setPhqSession] = useState(getPhqSession);
-  const [gadSession, setGadSession] = useState(getGadSession);
-  useLoad((options) => {
-    if (options.assessment === "gad") setAssessment("gad");
-  });
-  const gad = isGad(assessment);
-  const questions = gad ? gadQuestions : phqQuestions;
-  const options = gad ? gadOptions : phqOptions;
-  const isImpactStep = !gad && step === questions.length;
-  const selected = gad
-    ? gadSession.answers[step]
-    : isImpactStep
-      ? phqSession.impact
-      : phqSession.answers[step];
-  const totalSteps = questions.length + (gad ? 0 : 1);
-  const progress = Math.round(((step + 1) / totalSteps) * 100);
-  const labels = isImpactStep
-    ? phqImpactOptions
-    : options.map((option) => option.label);
-  const title = isImpactStep
-    ? "以上这些问题对您的工作、处理家中事务或与人相处时造成多大困难？"
-    : questions[step].text;
+  const [answers, setAnswers] = useState<Array<number | null>>([]);
 
-  const choose = (index: number) => {
-    if (gad) {
-      saveGadAnswer(step, index);
-      setGadSession(getGadSession());
-      return;
+  useLoad((options) => {
+    const id = typeof options.assessment === "string" ? options.assessment : "phq-9";
+    setScaleId(id);
+    const target = getScale(id);
+    if (target) {
+      setAnswers(getSession(target.id, target.questions.length).answers);
     }
-    if (isImpactStep) savePhqImpact(index);
-    else savePhqAnswer(step, index);
-    setPhqSession(getPhqSession());
+  });
+
+  const scale: Scale | undefined = getScale(scaleId);
+
+  if (!scale) {
+    return (
+      <View className="question-page">
+        <Nav back />
+        <View className="quiz-body">
+          <View className="quiz-question-card">
+            <Text className="question-title">未找到该量表</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  const total = scale.questions.length;
+  const current = scale.questions[step];
+  const selected = answers[step] ?? null;
+  const options = questionOptions(scale, current);
+  const progress = Math.round(((step + 1) / total) * 100);
+  const isLast = step + 1 === total;
+
+  const choose = (optionIndex: number) => {
+    saveAnswer(scale.id, total, step, optionIndex);
+    setAnswers(getSession(scale.id, total).answers);
   };
+
   const next = () => {
     if (selected === null) {
       Taro.showToast({ title: "请选择一项后继续", icon: "none" });
       return;
     }
-    if (step + 1 === totalSteps) {
-      if (gad) completeGadSession();
-      else completePhqSession();
-      Taro.redirectTo({ url: `/pages/report/index?assessment=${assessment}` });
+    if (isLast) {
+      completeSession(scale.id, total);
+      Taro.redirectTo({ url: `/pages/report/index?assessment=${scale.id}` });
       return;
     }
-    setStep((current) => current + 1);
+    setStep((currentStep) => currentStep + 1);
   };
-  const previous = () =>
-    step === 0 ? Taro.navigateBack() : setStep((current) => current - 1);
+
+  const previous = () => (step === 0 ? Taro.navigateBack() : setStep((currentStep) => currentStep - 1));
+
   return (
-    <View className="question-page phq-question-page">
+    <View className="question-page">
       <Nav back />
       <View className="quiz-body">
         <View className="quiz-progress">
           <View className="quiz-progress-summary">
             <View className="question-chip">
               <View className="question-chip-dot" />
-              <Text>
-                第 {step + 1} / {totalSteps} 题
-              </Text>
+              <Text>第 {step + 1} / {total} 题</Text>
             </View>
             <View className="progress-copy">
               <Text>{progress}%</Text>
@@ -92,23 +78,20 @@ export default function Questions() {
             </View>
           </View>
           <View className="progress-track">
-            <View
-              className="progress-value"
-              style={{ width: `${progress}%` }}
-            />
+            <View className="progress-value" style={{ width: `${progress}%` }} />
           </View>
         </View>
+
         <View className="quiz-question-card">
           <View className="question-orb" />
-          <Text className="question-kind">
-            {gad ? "GAD-7" : "PHQ-9"} · 过去两周
-          </Text>
-          <Text className="question-title">{title}</Text>
+          <Text className="question-kind">{scale.title}</Text>
+          <Text className="question-title">{current.text}</Text>
         </View>
+
         <View className="quiz-options">
-          {labels.map((label, index) => (
+          {options.map((option, index) => (
             <Button
-              key={label}
+              key={option.label}
               className={`quiz-option ${selected === index ? "is-selected" : ""}`}
               onClick={() => choose(index)}
             >
@@ -117,12 +100,7 @@ export default function Questions() {
                   <View className="option-radio-dot" />
                 </View>
                 <View className="option-copy">
-                  <Text className="option-title">{label}</Text>
-                  {!isImpactStep && (
-                    <Text className="option-hint">
-                      {options[index].score} 分
-                    </Text>
-                  )}
+                  <Text className="option-title">{option.label}</Text>
                 </View>
               </View>
               {selected === index ? (
@@ -135,18 +113,20 @@ export default function Questions() {
             </Button>
           ))}
         </View>
+
         <View className="quiz-note">
           <Icon name="autoAwesome" className="note-icon" />
-          <Text>请按过去两周的实际感受作答；本量表用于筛查，不用于诊断。</Text>
+          <Text>请按实际情况作答；结果用于自我了解与初步筛查，不构成临床诊断。</Text>
         </View>
       </View>
+
       <View className="quiz-footer">
         <Button className="quiz-prev" onClick={previous}>
           <Icon name="arrowBack" className="button-icon" />
           <Text>{step === 0 ? "返回" : "上一题"}</Text>
         </Button>
         <Button className="quiz-next" onClick={next}>
-          <Text>{step + 1 === totalSteps ? "查看报告" : "下一题"}</Text>
+          <Text>{isLast ? "查看报告" : "下一题"}</Text>
           <Icon name="arrowForward" className="button-icon" />
         </Button>
       </View>

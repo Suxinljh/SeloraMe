@@ -10,9 +10,10 @@ import relationshipImage from "../../assets/figma/home-relationship.png";
 import workImage from "../../assets/figma/home-work.png";
 import { setActiveTab } from "../../utils/custom-tabbar";
 
-const cards = [
+const cards: Array<[string, string, string, string, string, string, string]> = [
   [
     "专业",
+    "mbti",
     "MBTI 人格全解析",
     "深度了解你的性格偏好与处事模式",
     "18分钟",
@@ -21,15 +22,17 @@ const cards = [
   ],
   [
     "热门",
-    "近期情绪晴雨表",
-    "看看你最近处于哪种心理能量水平",
+    "internal-friction",
+    "情绪内耗自测评估",
+    "识别反刍思维与精神内耗模式",
     "8分钟",
     "免费",
     moodImage,
   ],
   [
     "深度",
-    "亲密关系依恋模式",
+    "attachment",
+    "成人恋爱依恋类型",
     "探索你在亲密互动中的安全感与期待",
     "12分钟",
     "免费",
@@ -37,8 +40,9 @@ const cards = [
   ],
   [
     "轻松",
-    "职场心理能量评估",
-    "诊断精力枯竭与个人职业倦怠诱因",
+    "aq",
+    "国际标准逆商测试",
+    "看看你面对挫折与职场压力时的复原力",
     "10分钟",
     "免费",
     workImage,
@@ -46,7 +50,9 @@ const cards = [
 ];
 
 export default function Home() {
-  const go = () => Taro.navigateTo({ url: "/pages/questions/index" });
+  const goDetail = (scaleId: string) =>
+    Taro.navigateTo({ url: `/pages/assessment-detail/index?assessment=${scaleId}` });
+  const go = () => goDetail("phq-9");
   useDidShow(() => setActiveTab(0));
   return (
     <View className="page home-page">
@@ -113,8 +119,8 @@ export default function Home() {
           </Text>
         </View>
         <View className="assessment-grid">
-          {cards.map(([badge, title, desc, duration, price, image], i) => (
-            <View key={title} className="feature-card" onClick={go}>
+          {cards.map(([badge, scaleId, title, desc, duration, price, image], i) => (
+            <View key={title} className="feature-card" onClick={() => goDetail(scaleId)}>
               <View className="art">
                 <Image src={image as string} mode="aspectFill" />
                 <Text className={`art-badge badge-${i}`}>{badge}</Text>

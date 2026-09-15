@@ -2592,3 +2592,92 @@ image {
     font-size: 30px;
     font-weight: 600;
 }
+
+/* 量表清单页头部：分类名 + 数量 */
+.list-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 24px 32px 0;
+}
+.list-head-count {
+    color: $muted;
+    font-size: 24px;
+}
+
+/* 分类页空态：无量表的分类降低视觉权重 */
+.categories-card.is-empty {
+    background: #f1ecf2;
+}
+.categories-card.is-empty .categories-card-name,
+.categories-card.is-empty .categories-card-count {
+    color: rgba(72, 69, 84, 0.5);
+}
+.categories-card.is-empty .categories-card-icon-wrap {
+    background: rgba(255, 255, 255, 0.6);
+}
+.categories-card.is-empty .categories-card-icon {
+    opacity: 0.4;
+}
+
+/* 测评详情页：量表不存在时的空态 */
+.assessment-detail-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 72px;
+    padding: 48px 32px;
+    border-radius: 32px;
+    background: #fff;
+    color: #484554;
+    font-size: 28px;
+}
+.assessment-detail-empty text:last-child {
+    margin-top: 12px;
+    color: $muted;
+    font-size: 22px;
+    line-height: 34px;
+    text-align: center;
+}
+
+/* 测评详情页：量表来源说明 */
+.assessment-detail-source-note {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 24px;
+    padding: 24px 32px;
+    border-radius: 28px;
+    background: #f7f2f8;
+}
+.assessment-detail-source-icon {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    filter: invert(51%) sepia(11%) saturate(552%) hue-rotate(212deg)
+        brightness(89%) contrast(86%);
+}
+.assessment-detail-source-note view {
+    display: flex;
+    flex-direction: column;
+}
+.assessment-detail-source-note text:first-child {
+    color: #484554;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 34px;
+}
+.assessment-detail-source-note text:last-child {
+    margin-top: 2px;
+    color: $muted;
+    font-size: 22px;
+    line-height: 32px;
+}
+
+/* 报告页：作答回顾中未作答/低权重的行 */
+.score > text {
+    display: block;
+    font-size: 20px;
+    color: $muted;
+    line-height: 30px;
+}

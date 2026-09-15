@@ -1,4 +1,6 @@
-import { getGadSession, getPhqSession } from '../store/session'
+import { allScales } from './scales'
+import { peekSession } from '../store/session'
+import { scoreAnswers, type Scale } from './scales/types'
 
 export type ProfileTopic = {
   label: string
@@ -12,38 +14,43 @@ export type ProfileOverview = {
   topics: ProfileTopic[]
 }
 
-const sum = (answers: Array<number | null>, indexes: number[]) => indexes.reduce((total, index) => total + (answers[index] ?? 0), 0)
-
-export function getProfileOverview (): ProfileOverview {
-  const phq = getPhqSession()
-  const gad = getGadSession()
+/** 已完成量表的作答，转换为维度得分并汇总为「关注主题」 */
+const collectTopics = (): ProfileTopic[] => {
   const topics: ProfileTopic[] = []
 
-  if (phq.completedAt) {
-    const definitions = [
-      { label: '情绪体验', detail: '基于情绪低落相关作答', indexes: [0, 1] },
-      { label: '睡眠与精力', detail: '基于睡眠与精力相关作答', indexes: [2, 3] },
-      { label: '饮食与自我评价', detail: '基于饮食与自我评价相关作答', indexes: [4, 5] },
-      { label: '专注与行动状态', detail: '基于专注和行动状态相关作答', indexes: [6, 7] },
-    ]
-    definitions.forEach(({ label, detail, indexes }) => {
-      const score = sum(phq.answers, indexes)
-      if (score > 0) topics.push({ label, detail, score })
-    })
-  }
+  allScales.forEach((scale: Scale) => {
+    const session = peekSession(scale.id)
+    const answers = Array.isArray(session?.answers) ? session.answers : []
+    if (answers.length !== scale.questions.length) return
+    if (typeof session?.completedAt !== 'number') return
 
-  if (gad.completedAt) {
-    const definitions = [
-      { label: '焦虑与担忧', detail: '基于紧张和担忧相关作答', indexes: [0, 1, 2, 6] },
-      { label: '放松与安定感', detail: '基于放松困难相关作答', indexes: [3, 4] },
-      { label: '易怒与敏感度', detail: '基于易怒或急躁相关作答', indexes: [5] },
-    ]
-    definitions.forEach(({ label, detail, indexes }) => {
-      const score = sum(gad.answers, indexes)
-      if (score > 0) topics.push({ label, detail, score })
+    const result = scoreAnswers(scale, answers)
+    scale.dimensions.forEach((dimension) => {
+      const score = result.byDimension[dimension.key] ?? 0
+      if (score <= 0) return
+      topics.push({
+        label: dimension.name,
+        detail: `来自《${scale.title}》的${dimension.name}维度`,
+        score,
+      })
     })
-  }
+  })
 
-  const completedCount = Number(Boolean(phq.completedAt)) + Number(Boolean(gad.completedAt))
-  return { completedCount, reportCount: completedCount, topics: topics.sort((a, b) => b.score - a.score).slice(0, 5) }
+  return topics
+}
+
+export function getProfileOverview(): ProfileOverview {
+  const completed = allScales.filter((scale) => {
+    const session = peekSession(scale.id)
+    const answers = Array.isArray(session?.answers) ? session.answers : []
+    return answers.length === scale.questions.length && typeof session?.completedAt === 'number'
+  })
+
+  const topics = collectTopics().sort((first, second) => second.score - first.score).slice(0, 5)
+
+  return {
+    completedCount: completed.length,
+    reportCount: completed.length,
+    topics,
+  }
 }

@@ -2,7 +2,7 @@ import { Button, Image, Text, View } from "@tarojs/components";
 import Taro, { useDidShow } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
-import { assessments, type Assessment } from "../../data/assessments";
+import { SCALE_CATEGORIES, categoryCounts, type ScaleCategory } from "../../data/scales";
 import { setActiveTab } from "../../utils/custom-tabbar";
 import psychologyIcon from "../../assets/icons/material/category-psychology.svg";
 import sentimentSatisfiedIcon from "../../assets/icons/material/category-sentiment-satisfied.svg";
@@ -15,40 +15,47 @@ import paletteIcon from "../../assets/icons/material/category-palette.svg";
 import autoAwesomeIcon from "../../assets/icons/material/category-auto-awesome.svg";
 import badgeIcon from "../../assets/icons/material/category-badge.svg";
 
-type Category = {
-  name: string;
-  assessmentCategory?: Assessment["category"];
-  icon: string;
+/** 分类图标。key 与 SCALE_CATEGORIES 一一对应 */
+const categoryIcons: Record<ScaleCategory, string> = {
+  personality: psychologyIcon,
+  emotion: sentimentSatisfiedIcon,
+  romance: favoriteIcon,
+  social: groupsIcon,
+  career: businessCenterIcon,
+  self: exploreIcon,
+  lifestyle: spaIcon,
+  interest: paletteIcon,
+  fun: autoAwesomeIcon,
+  professional: badgeIcon,
 };
-
-const categories: Category[] = [
-  { name: "性格人格", icon: psychologyIcon },
-  { name: "情绪心理", assessmentCategory: "emotion", icon: sentimentSatisfiedIcon },
-  { name: "恋爱关系", icon: favoriteIcon },
-  { name: "人际关系", icon: groupsIcon },
-  { name: "职场能力", icon: businessCenterIcon },
-  { name: "自我探索", icon: exploreIcon },
-  { name: "生活状态", icon: spaIcon },
-  { name: "兴趣偏好", icon: paletteIcon },
-  { name: "趣味测试", icon: autoAwesomeIcon },
-  { name: "专业量表", icon: badgeIcon },
-];
 
 const hotTags = [
   "MBTI深度版",
-  "依恋理论",
-  "焦虑自评量表",
-  "九型人格",
+  "霍兰德职业兴趣",
   "抑郁倾向筛查",
-  "社交恐惧指数",
-  "情绪耗竭度",
-  "职场高潜潜质",
+  "艾森克人格",
+  "焦虑自评量表",
+  "成人依恋类型",
+  "中医体质",
+  "情商测评",
 ];
 
 export default function Categories() {
-  const goToList = (name: string) => {
-    const category = name === "情绪心理" ? "?category=emotion" : "";
-    Taro.navigateTo({ url: `/pages/assessment-list/index${category}` });
+  const counts = categoryCounts();
+
+  const goToList = (key: ScaleCategory, count: number) => {
+    if (count === 0) {
+      Taro.showToast({ title: "该分类量表正在筹备中", icon: "none" });
+      return;
+    }
+    Taro.navigateTo({ url: `/pages/assessment-list/index?category=${key}` });
+  };
+
+  /** 热门标签指向所属分类；找不到对应分类时回落到情绪心理 */
+  const goByTag = (tag: string) => {
+    const matched = SCALE_CATEGORIES.find(({ name }) => tag.includes(name.slice(0, 2)));
+    const key: ScaleCategory = matched ? matched.key : "emotion";
+    goToList(key, counts[key]);
   };
 
   useDidShow(() => setActiveTab(1));
@@ -58,32 +65,35 @@ export default function Categories() {
       <Nav light className="categories-nav">
         <View className="categories-nav-heading">
           <Text className="categories-title">全部测评</Text>
-          <Text className="categories-subtitle">
-            按心理维度与生活情境分类探索
-          </Text>
+          <Text className="categories-subtitle">按心理维度与生活情境分类探索</Text>
         </View>
       </Nav>
       <View className="categories-content">
         <View className="categories-grid">
-          {categories.map(({ name, assessmentCategory, icon }) => {
-            const count = assessments.filter(
-              (assessment) => assessment.category === assessmentCategory,
-            ).length;
+          {SCALE_CATEGORIES.map(({ key, name }) => {
+            const count = counts[key];
+            const empty = count === 0;
 
             return (
-            <View
-              key={name}
-              className="categories-card"
-              onClick={() => goToList(name)}
-            >
-              <View className="categories-card-copy">
-                <Text className="categories-card-name">{name}</Text>
-                <Text className="categories-card-count">{count}</Text>
+              <View
+                key={key}
+                className={`categories-card ${empty ? "is-empty" : ""}`}
+                onClick={() => goToList(key, count)}
+              >
+                <View className="categories-card-copy">
+                  <Text className="categories-card-name">{name}</Text>
+                  <Text className="categories-card-count">
+                    {empty ? "筹备中" : `${count} 个量表`}
+                  </Text>
+                </View>
+                <View className="categories-card-icon-wrap">
+                  <Image
+                    src={categoryIcons[key]}
+                    className="categories-card-icon"
+                    mode="aspectFit"
+                  />
+                </View>
               </View>
-              <View className="categories-card-icon-wrap">
-                <Image src={icon} className="categories-card-icon" mode="aspectFit" />
-              </View>
-            </View>
             );
           })}
         </View>
@@ -94,17 +104,7 @@ export default function Categories() {
           </View>
           <View className="categories-tags">
             {hotTags.map((tag) => (
-              <Text
-                key={tag}
-                className="categories-tag"
-                onClick={() =>
-                  goToList(
-                    tag.includes("焦虑") || tag.includes("抑郁")
-                      ? "情绪心理"
-                      : "",
-                  )
-                }
-              >
+              <Text key={tag} className="categories-tag" onClick={() => goByTag(tag)}>
                 # {tag}
               </Text>
             ))}
@@ -116,15 +116,11 @@ export default function Categories() {
           </View>
           <View className="categories-suggest-copy">
             <Text className="categories-suggest-title">找不到心仪测评？</Text>
-            <Text className="categories-suggest-detail">
-              告诉我们你的困惑，即刻为你匹配
-            </Text>
+            <Text className="categories-suggest-detail">告诉我们你的困惑，即刻为你匹配</Text>
           </View>
           <Button
             className="categories-suggest-button"
-            onClick={() =>
-              Taro.showToast({ title: "建议功能即将上线", icon: "none" })
-            }
+            onClick={() => Taro.showToast({ title: "建议功能即将上线", icon: "none" })}
           >
             提建议
           </Button>

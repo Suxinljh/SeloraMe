@@ -1,32 +1,68 @@
 import Taro from '@tarojs/taro'
 
-export type PhqSession = { answers: Array<number | null>; impact: number | null; completedAt: number | null }
-const key = 'selorme-phq-9-session'
-const emptySession = (): PhqSession => ({ answers: Array<number | null>(9).fill(null), impact: null, completedAt: null })
-
-export function getPhqSession(): PhqSession {
-  const stored = Taro.getStorageSync<Partial<PhqSession>>(key)
-  if (!stored || !Array.isArray(stored.answers) || stored.answers.length !== 9) return emptySession()
-  return { answers: stored.answers, impact: typeof stored.impact === 'number' ? stored.impact : null, completedAt: typeof stored.completedAt === 'number' ? stored.completedAt : null }
+/**
+ * 量表作答会话。
+ *
+ * 每个量表一份，按 `selorme-session-<scaleId>` 存储，避免为每个量表写一套读写函数。
+ * answers 的长度必须与量表的题目数一致；长度不符时视为无效数据并重置，
+ * 以兼容量表题目变更后的旧数据。
+ */
+export type ScaleSession = {
+  answers: Array<number | null>
+  completedAt: number | null
 }
 
-function save(session: PhqSession) { Taro.setStorageSync(key, session) }
+const storageKey = (scaleId: string) => `selorme-session-${scaleId}`
 
-export function savePhqAnswer(index: number, answer: number) {
-  const session = getPhqSession(); session.answers[index] = answer; save(session)
-}
-export function savePhqImpact(impact: number) { const session = getPhqSession(); session.impact = impact; save(session) }
-export function completePhqSession() { const session = getPhqSession(); session.completedAt = Date.now(); save(session) }
-export function resetPhqSession() { save(emptySession()) }
+const emptySession = (questionCount: number): ScaleSession => ({
+  answers: Array<number | null>(questionCount).fill(null),
+  completedAt: null,
+})
 
-export type GadSession = { answers: Array<number | null>; completedAt: number | null }
-const gadKey = 'selorme-gad-7-session'
-const emptyGadSession = (): GadSession => ({ answers: Array<number | null>(7).fill(null), completedAt: null })
-export function getGadSession(): GadSession {
-  const stored = Taro.getStorageSync<Partial<GadSession>>(gadKey)
-  if (!stored || !Array.isArray(stored.answers) || stored.answers.length !== 7) return emptyGadSession()
-  return { answers: stored.answers, completedAt: typeof stored.completedAt === 'number' ? stored.completedAt : null }
+export function getSession(scaleId: string, questionCount: number): ScaleSession {
+  const stored = Taro.getStorageSync<Partial<ScaleSession>>(storageKey(scaleId))
+  if (!stored || !Array.isArray(stored.answers) || stored.answers.length !== questionCount) {
+    return emptySession(questionCount)
+  }
+  return {
+    answers: stored.answers,
+    completedAt: typeof stored.completedAt === 'number' ? stored.completedAt : null,
+  }
 }
-export function saveGadAnswer(index: number, answer: number) { const session = getGadSession(); session.answers[index] = answer; Taro.setStorageSync(gadKey, session) }
-export function completeGadSession() { const session = getGadSession(); session.completedAt = Date.now(); Taro.setStorageSync(gadKey, session) }
-export function resetGadSession() { Taro.setStorageSync(gadKey, emptyGadSession()) }
+
+function save(scaleId: string, session: ScaleSession) {
+  Taro.setStorageSync(storageKey(scaleId), session)
+}
+
+export function saveAnswer(scaleId: string, questionCount: number, index: number, optionIndex: number) {
+  const session = getSession(scaleId, questionCount)
+  if (index < 0 || index >= questionCount) return
+  session.answers[index] = optionIndex
+  save(scaleId, session)
+}
+
+export function completeSession(scaleId: string, questionCount: number) {
+  const session = getSession(scaleId, questionCount)
+  session.completedAt = Date.now()
+  save(scaleId, session)
+}
+
+export function resetSession(scaleId: string, questionCount: number) {
+  save(scaleId, emptySession(questionCount))
+}
+
+/** 已作答题数，用于「继续测评」的进度文案 */
+export function answeredCount(scaleId: string, questionCount: number): number {
+  return getSession(scaleId, questionCount).answers.filter((answer) => answer !== null).length
+}
+
+/** 读取该量表在存储中留下的原始记录，不校验长度。供归档聚合使用 */
+export function peekSession(scaleId: string): Partial<ScaleSession> | null {
+  const stored = Taro.getStorageSync<Partial<ScaleSession>>(storageKey(scaleId))
+  return stored && typeof stored === 'object' ? stored : null
+}
+
+/** 清除全部量表会话。scaleIds 由调用方传入，避免此处依赖数据层造成循环引用 */
+export function clearAllSessions(scaleIds: string[]) {
+  scaleIds.forEach((id) => Taro.removeStorageSync(storageKey(id)))
+}
