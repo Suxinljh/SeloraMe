@@ -1,0 +1,2 @@
+import type { UserConfigExport } from '@tarojs/cli'
+export default { projectName: 'SeloraMe', date: '2026-09-14', designWidth: 390, deviceRatio: { 390: 1 }, sourceRoot: 'src', outputRoot: 'dist', framework: 'react', compiler: 'webpack5', baseLevel: 32, plugins: ['@tarojs/plugin-framework-react','@tarojs/plugin-platform-weapp'], mini: { postcss: { pxtransform: { enable: true, config: { selectorBlackList: ['taro'] } } } } } satisfies UserConfigExport

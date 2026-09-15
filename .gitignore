@@ -1,0 +1,48 @@
+# ============================================================
+# SeloraMe .gitignore
+# 微信小程序：Taro 4 + React 18 + TypeScript + SCSS
+# 参见 AGENTS.md
+# ============================================================
+
+# ---------- 依赖 ----------
+node_modules/
+cloudfunctions/**/node_modules/
+
+# ---------- 构建产物（由 npm run build:weapp 重新生成）----------
+dist/
+.swc/
+*.tsbuildinfo
+
+# ---------- 微信开发者工具本机配置 ----------
+# 仅保存当前机器的编译与调试偏好，不参与协作
+project.private.config.json
+
+# ---------- 环境变量 ----------
+.env
+.env.*
+!.env.example
+
+# ---------- 日志 ----------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- 编辑器与系统文件 ----------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ---------- WorkBuddy 项目数据 ----------
+# 本地会话记忆与清理前备份，不属于工程源码
+.workbuddy/
+
+# ---------- 设计参考与设计源文件 ----------
+# 体积较大且属于设计过程产物，仅保留在本地
+.figma-reference/
+*.ai
+Codex 图像*.png
+未标题-1.svg

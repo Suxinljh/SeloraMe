@@ -1,0 +1,7 @@
+import { useState } from 'react'
+import { View, Text, ScrollView } from '@tarojs/components'
+import Taro, { useLoad } from '@tarojs/taro'
+import Nav from '../../components/Nav'
+import Icon from '../../components/Icon'
+import { assessments } from '../../data/assessments'
+export default function List(){const [active,setActive]=useState(0);const [emotionOnly,setEmotionOnly]=useState(false);useLoad((options)=>setEmotionOnly(options.category==='emotion'));const visible=emotionOnly?assessments.filter(x=>x.category==='emotion'):assessments;return <View className='page'><Nav back light/><ScrollView scrollX className='chip-row'>{['综合推荐','最受关注','专业量表','免费测试'].map((x,i)=><Text key={x} className={`chip ${active===i?'active':''}`} onClick={()=>setActive(i)}>{x}</Text>)}</ScrollView><View className='list'>{emotionOnly&&<Text className='list-heading'>情绪心理</Text>}{visible.map(x=><View className='assessment-card' key={x.id} onClick={()=>Taro.navigateTo({url:`/pages/assessment-detail/index?assessment=${x.id}`})}><View><Text className='assessment-name'>{x.title}</Text><Text className='assessment-desc'>{x.desc}</Text><Text className='assessment-meta'><Icon name='schedule' className='meta-icon'/>{x.meta}</Text></View><View className='assessment-bottom'><Text className={`tag ${x.free?'tag-green':''}`}>{x.tag}</Text><Text className={`fee ${x.free?'':'paid'}`}>{x.free?'免费':x.price}</Text></View></View>)}<Text className='empty'>没有更多了</Text></View></View>}
