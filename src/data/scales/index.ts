@@ -111,3 +111,36 @@ export const categoryCounts = (): Record<ScaleCategory, number> =>
 /** 有内容的分类数量，用于统计文案 */
 export const filledCategoryCount = (): number =>
   SCALE_CATEGORIES.filter(({ key }) => scalesByCategory(key).length > 0).length
+
+/** 把关键词拆成词项，按空白切分 */
+const termsOf = (keyword: string): string[] =>
+  keyword.trim().toLowerCase().split(/\s+/).filter((term) => term.length > 0)
+
+/**
+ * 按关键词搜索量表。
+ *
+ * 匹配范围**只包含「标题」与「描述」两个字段**，不涉及介绍正文、分类、标签或维度名
+ * —— 那些字段内容长，纳入匹配会让结果变得难以预期。
+ * 支持空格分隔的多个词项，全部命中才算匹配（不要求出现在同一字段）。
+ */
+export const searchScales = (keyword: string): Scale[] => {
+  const terms = termsOf(keyword)
+  if (terms.length === 0) return []
+  return allScales.filter((scale) => {
+    const haystack = `${scale.title} ${scale.desc}`.toLowerCase()
+    return terms.every((term) => haystack.includes(term))
+  })
+}
+
+/**
+ * 找出文本中首个命中的词项区间，供搜索结果页高亮。
+ * 无命中时返回 null。
+ */
+export const matchRange = (text: string, keyword: string): { start: number; end: number } | null => {
+  const lower = text.toLowerCase()
+  for (const term of termsOf(keyword)) {
+    const index = lower.indexOf(term)
+    if (index >= 0) return { start: index, end: index + term.length }
+  }
+  return null
+}

@@ -59,7 +59,7 @@ export default function Home() {
     <View className="page home-page">
       <Nav light />
       <View className="content">
-        <View className="search home-search">
+        <View className="search home-search" onClick={() => Taro.navigateTo({ url: "/pages/search/index" })}>
           <Image src={searchIcon} className="search-icon" />
           <Text>搜索测评，如 MBTI、霍兰德、焦虑指数...</Text>
         </View>

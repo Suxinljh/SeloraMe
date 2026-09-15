@@ -3,6 +3,7 @@ import type { ImageProps } from '@tarojs/components'
 import arrowBack from '@material-design-icons/svg/round/arrow_back.svg'
 import arrowForward from '@material-design-icons/svg/round/arrow_forward.svg'
 import search from '@material-design-icons/svg/round/search.svg'
+import close from '@material-design-icons/svg/round/close.svg'
 import check from '@material-design-icons/svg/round/check.svg'
 import chevronRight from '@material-design-icons/svg/round/chevron_right.svg'
 import home from '@material-design-icons/svg/round/home.svg'
@@ -38,14 +39,26 @@ import helpOutlineOutlined from '@material-design-icons/svg/outlined/help_outlin
 import settingsOutlined from '@material-design-icons/svg/outlined/settings.svg'
 import psychologyOutlined from '@material-design-icons/svg/outlined/psychology.svg'
 
-const icons = { arrowBack, arrowForward, search, check, chevronRight, home, gridView, accountCircle, psychology, sentimentSatisfied, favorite, groups, businessCenter, explore, spa, palette, autoAwesome, badge, helpOutline, quiz, inventory, assessment, receipt, bookmark, calendar, settings, replay, share, download, schedule, logout }
-const outlinedIcons = { receipt: receiptOutlined, bookmark: bookmarkOutlined, calendar: calendarOutlined, helpOutline: helpOutlineOutlined, settings: settingsOutlined, psychology: psychologyOutlined }
+const icons = { arrowBack, arrowForward, search, close, check, chevronRight, home, gridView, accountCircle, psychology, sentimentSatisfied, favorite, groups, businessCenter, explore, spa, palette, autoAwesome, badge, helpOutline, quiz, inventory, assessment, receipt, bookmark, calendar, settings, replay, share, download, schedule, logout }
 export type IconName = keyof typeof icons
 export type IconVariant = 'round' | 'outlined'
+
+/**
+ * outlined 形态覆盖表。键必须来自 icons，写错键名编译期即报错。
+ * 注意：这里不能写成 `Record<IconName, string>`，因为只有少数量表图标提供 outlined 版本。
+ */
+const outlinedIcons: Partial<Record<IconName, string>> = {
+  receipt: receiptOutlined,
+  bookmark: bookmarkOutlined,
+  calendar: calendarOutlined,
+  helpOutline: helpOutlineOutlined,
+  settings: settingsOutlined,
+  psychology: psychologyOutlined,
+}
+
 export default function Icon ({ name, variant = 'round', className = '', ...props }: { name: IconName; variant?: IconVariant; className?: string } & Omit<ImageProps, 'src' | 'mode'>) {
-  const source = variant === 'outlined' && name in outlinedIcons
-    ? outlinedIcons[name as keyof typeof outlinedIcons]
-    : icons[name]
+  const outlined = variant === 'outlined' ? outlinedIcons[name] : undefined
+  const source = outlined ?? icons[name]
 
   return <Image className={`material-icon ${className}`} src={source} mode='aspectFit' {...props} />
 }
