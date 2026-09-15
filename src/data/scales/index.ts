@@ -51,6 +51,7 @@ import subjectInterest from './interest/subject-interest'
 export { SCALE_CATEGORIES }
 export type { Scale, ScaleCategory }
 export * from './types'
+export * from './interactions'
 
 /** 全部量表。顺序即列表页默认展示顺序。 */
 export const allScales: Scale[] = [

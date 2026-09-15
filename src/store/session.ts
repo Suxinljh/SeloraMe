@@ -1,4 +1,5 @@
 import Taro from '@tarojs/taro'
+import type { QuizAnswers, QuizAnswerValue } from '../data/scales'
 
 /**
  * 量表作答会话。
@@ -6,16 +7,19 @@ import Taro from '@tarojs/taro'
  * 每个量表一份，按 `selorme-session-<scaleId>` 存储，避免为每个量表写一套读写函数。
  * answers 的长度必须与量表的题目数一致；长度不符时视为无效数据并重置，
  * 以兼容量表题目变更后的旧数据。
+ *
+ * 作答值的形态由题目的作答交互决定（单选是下标、多选是下标数组、
+ * 排序是名次数组、配对是映射对象），这里只做透传，不解释内容。
  */
 export type ScaleSession = {
-  answers: Array<number | null>
+  answers: QuizAnswers
   completedAt: number | null
 }
 
 const storageKey = (scaleId: string) => `selorme-session-${scaleId}`
 
 const emptySession = (questionCount: number): ScaleSession => ({
-  answers: Array<number | null>(questionCount).fill(null),
+  answers: Array<QuizAnswers[number]>(questionCount).fill(null),
   completedAt: null,
 })
 
@@ -34,10 +38,10 @@ function save(scaleId: string, session: ScaleSession) {
   Taro.setStorageSync(storageKey(scaleId), session)
 }
 
-export function saveAnswer(scaleId: string, questionCount: number, index: number, optionIndex: number) {
+export function saveAnswer(scaleId: string, questionCount: number, index: number, value: QuizAnswerValue | null) {
   const session = getSession(scaleId, questionCount)
   if (index < 0 || index >= questionCount) return
-  session.answers[index] = optionIndex
+  session.answers[index] = value
   save(scaleId, session)
 }
 

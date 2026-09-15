@@ -1,6 +1,7 @@
 import { allScales } from './scales'
 import { peekSession } from '../store/session'
-import { scoreAnswers, type Scale } from './scales/types'
+import { scoreAnswers } from './scales/interactions'
+import type { Scale } from './scales/types'
 
 export type ProfileTopic = {
   label: string

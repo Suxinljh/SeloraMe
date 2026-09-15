@@ -2675,6 +2675,163 @@ image {
     line-height: 32px;
 }
 
+/* ══════════════════════════════════════════════
+   作答交互组件（src/features/quiz）
+   单选沿用 .quiz-option 既有样式，以下为多选、排序、配对新增部分
+   ══════════════════════════════════════════════ */
+.answer-area {
+    display: block;
+}
+
+.quiz-options-hint {
+    padding: 0 8px 8px;
+    color: $muted;
+    font-size: 22px;
+    line-height: 32px;
+}
+
+/* 多选：方形勾选框 */
+.option-checkbox {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid #d7d2e0;
+    border-radius: 12px;
+    background: #fff;
+}
+.quiz-option.is-selected .option-checkbox {
+    border-color: $purple;
+    background: $purple;
+}
+.option-checkbox-icon {
+    width: 28px;
+    height: 28px;
+    filter: brightness(0) invert(1);
+}
+
+/* 排序：名次徽标 */
+.quiz-option-rank .quiz-rank-badge {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #f1ecf2;
+    color: #484554;
+    font-size: 24px;
+    font-weight: 600;
+}
+.quiz-option-rank .quiz-rank-badge.is-filled {
+    background: $purple;
+    color: #fff;
+}
+.quiz-reset {
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+    margin: 4px 0 0;
+    padding: 12px 28px;
+    border: 0;
+    border-radius: 999px;
+    background: #f1ecf2;
+    color: #484554;
+    font-size: 22px;
+    line-height: 32px;
+}
+.quiz-reset::after {
+    border: 0;
+}
+
+/* 配对：左右两列 */
+.quiz-match {
+    display: block;
+}
+.quiz-match-columns {
+    display: flex;
+    gap: 16px;
+}
+.quiz-match-col {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: 12px;
+}
+.quiz-match-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 88px;
+    margin: 0;
+    padding: 16px 20px;
+    border: 2px solid transparent;
+    border-radius: 24px;
+    background: #fff;
+    color: #1c1b1f;
+    text-align: left;
+}
+.quiz-match-item::after {
+    border: 0;
+}
+.quiz-match-item.is-paired {
+    border-color: $purple;
+    background: $soft;
+}
+.quiz-match-item.is-pending {
+    border-color: #7357e8;
+    background: #f1ecfd;
+}
+.quiz-match-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 22px;
+    line-height: 32px;
+}
+.quiz-match-badge {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: $purple;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* 图片选项：任一选项带图时整组切为图文卡片布局 */
+.quiz-options.has-image {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+.quiz-option-image {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 200px;
+}
+.option-image {
+    width: 100%;
+    height: 200px;
+    border-radius: 20px;
+    background: #f7f2f8;
+}
+
+/* 报告页：字母/名次型量表的作答回顾单行 */
+.score text:last-child {
+    word-break: break-all;
+}
+
 /* 报告页：字母型量表（MBTI / DISC）的类型代码 */
 .report-type {
     display: block;

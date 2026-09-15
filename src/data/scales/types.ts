@@ -37,12 +37,56 @@ export const SCALE_CATEGORIES: Array<{ key: ScaleCategory; name: string }> = [
   { key: 'professional', name: '专业量表' },
 ]
 
+/**
+ * 作答交互类型。
+ *
+ * 新增一种交互 = 三处改动，且 Record 类型会强制补齐：
+ * 1. 在此联合类型加一个 kind
+ * 2. src/data/scales/interactions.ts 内的实现表加一条 Record 记录
+ * 3. src/features/quiz/registry.tsx 内的组件表加一条 Record 记录
+ * 答题页本身不需要改动。
+ */
+export type QuizInteractionKind = 'single' | 'multiple' | 'rank' | 'match'
+
+export type QuizInteraction =
+  /** 单选 */
+  | { kind: 'single' }
+  /** 多选。min / max 用于校验可选数量 */
+  | { kind: 'multiple'; min?: number; max?: number }
+  /** 排序：把全部选项按符合程度排出名次，名次分从选项个数递减到 1 */
+  | { kind: 'rank' }
+  /** 配对：题目的 options 为左列，targets 为右列，需一一配对 */
+  | { kind: 'match'; targets: string[] }
+
+/**
+ * 单题作答值。按交互类型取不同形态：
+ * - single   → number              选中的选项下标
+ * - multiple → number[]            选中的选项下标集合
+ * - rank     → number[]            选项下标按名次从高到低排列（长度为选项数）
+ * - match    → Record<string, number>  左列下标（字符串）→ 右列下标
+ */
+export type QuizAnswerValue = number | number[] | Record<string, number>
+
+/** 整卷作答。下标与 scale.questions 对齐 */
+export type QuizAnswers = Array<QuizAnswerValue | null>
+
 export type ScaleOption = {
   /** 选项文案，如「完全没有」「有几天」 */
   label: string
   /** 该选项对应的原始得分 */
   score: number
+  /**
+   * 选项配图 URL。用于图片题（如瑞文智力测验的图形矩阵）。
+   *
+   * 图片是「选项的属性」而不是一种交互类型：单选、多选都能带图，
+   * 因此不需要新增 kind，交互组件会自动切换成图文卡片布局。
+   * 走网络图时需为域名配置 downloadFile 合法域名。
+   */
+  image?: string
+  /** 配图裁剪方式，默认 aspectFit */
+  imageFit?: 'aspectFit' | 'aspectFill'
 }
+
 
 export type ScaleQuestion = {
   /** 从 1 开始的题号 */
@@ -70,6 +114,11 @@ export type ScaleQuestion = {
    * 这类量表的选项分值不计分，类型由被选中的字母累计得出。
    */
   letters?: string[]
+  /**
+   * 该题的作答交互。省略时按单选处理。
+   * 渲染与校验由 src/features/quiz 按 kind 分发，本字段只声明类型。
+   */
+  interaction?: QuizInteraction
 }
 
 /** 计分方式 */
@@ -161,54 +210,6 @@ export const maxOptionScore = (scale: Scale): number => {
 /** 由题目与选项推导题目数量文案 */
 export const scaleMeta = (scale: Scale): string => `${scale.questions.length} 题 · ${scale.duration}`
 
-/** 单题计分，处理反向题与逐题选项 */
-export const questionScore = (scale: Scale, question: ScaleQuestion, optionIndex: number): number => {
-  const options = questionOptions(scale, question)
-  const raw = options[optionIndex]?.score ?? 0
-  if (!question.reverse) return raw
-  const scores = options.map((option) => option.score)
-  if (scores.length === 0) return raw
-  return Math.max(...scores) + Math.min(...scores) - raw
-}
-
-export type ScaleResult = {
-  /** 计分题得分总和 */
-  total: number
-  /** 计分题均分 */
-  average: number
-  /** 各维度得分 */
-  byDimension: Record<string, number>
-  /** 已作答题数（含不计分题） */
-  answered: number
-  /** 计入总分的题数 */
-  scoredCount: number
-}
-
-/** 汇总计分。scored === false 的题目只记录作答，不参与总分与维度 */
-export const scoreAnswers = (scale: Scale, answers: Array<number | null>): ScaleResult => {
-  let total = 0
-  let scoredAnswered = 0
-  let scoredCount = 0
-  const byDimension: Record<string, number> = {}
-
-  scale.questions.forEach((question, index) => {
-    const isScored = question.scored !== false
-    if (isScored) scoredCount += 1
-
-    const optionIndex = answers[index]
-    if (optionIndex === null || optionIndex === undefined) return
-    if (!isScored) return
-
-    const value = questionScore(scale, question, optionIndex)
-    total += value
-    scoredAnswered += 1
-    if (question.dimension) byDimension[question.dimension] = (byDimension[question.dimension] ?? 0) + value
-  })
-
-  const answered = answers.filter((answer) => answer !== null && answer !== undefined).length
-  return { total, average: scoredAnswered ? total / scoredAnswered : 0, byDimension, answered, scoredCount }
-}
-
 /** 取某维度已作答的计分题数，用于计算维度均分 */
 export const dimensionItemCount = (scale: Scale, dimensionKey: string): number =>
   scale.questions.filter((question) => question.dimension === dimensionKey && question.scored !== false).length
@@ -216,19 +217,6 @@ export const dimensionItemCount = (scale: Scale, dimensionKey: string): number =
 /** 按分界值取分级带 */
 export const resolveBand = (bands: ScaleBand[] | undefined, value: number): ScaleBand | undefined =>
   bands?.find((band) => value >= band.min && value <= band.max)
-
-/** 统计各类型字母被选中的次数。用于 MBTI / DISC 这类以字母累计判定类型的量表 */
-export const letterCounts = (scale: Scale, answers: Array<number | null>): Record<string, number> => {
-  const counts: Record<string, number> = {}
-  scale.questions.forEach((question, index) => {
-    const optionIndex = answers[index]
-    if (optionIndex === null || optionIndex === undefined) return
-    const letter = question.letters?.[optionIndex]
-    if (!letter) return
-    counts[letter] = (counts[letter] ?? 0) + 1
-  })
-  return counts
-}
 
 /** 取字母计数最高的一项；并列时按传入顺序取靠前者 */
 export const topLetter = (counts: Record<string, number>, order: string[]): string =>

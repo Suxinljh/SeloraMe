@@ -3,7 +3,7 @@ import { Button, Text, View } from "@tarojs/components";
 import Taro, { useLoad } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
-import { getScale, letterCounts, maxOptionScore, mbtiType, questionOptions, questionScore, resolveBand, scoreAnswers, topLetter, LETTER_LABELS, DISC_LABELS, type Scale } from "../../data/scales";
+import { getScale, letterCounts, maxOptionScore, mbtiType, questionOptions, rankTally, resolveBand, scoreAnswers, summarizeAnswer, topLetter, usesInteraction, LETTER_LABELS, DISC_LABELS, type QuizAnswers, type Scale } from "../../data/scales";
 import { getSession, resetSession } from "../../store/session";
 
 const MBTI_LETTERS = ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P']
@@ -18,7 +18,7 @@ const defaultDisclaimer =
 
 export default function Report() {
   const [scaleId, setScaleId] = useState("");
-  const [answers, setAnswers] = useState<Array<number | null>>([]);
+  const [answers, setAnswers] = useState<QuizAnswers>([]);
   const [completedAt, setCompletedAt] = useState<number | null>(null);
 
   useLoad((options) => {
@@ -64,7 +64,8 @@ export default function Report() {
 
   /** PHQ-9 第 9 题非 0 时的安全提示 */
   const safetyQuestionIndex = scale.id === "phq-9" ? 8 : -1;
-  const needsSafetyNotice = safetyQuestionIndex >= 0 && (answers[safetyQuestionIndex] ?? 0) > 0;
+  const safetyAnswer = safetyQuestionIndex >= 0 ? answers[safetyQuestionIndex] : null;
+  const needsSafetyNotice = typeof safetyAnswer === "number" && safetyAnswer > 0;
 
   const restart = () => {
     resetSession(scale.id, scale.questions.length);
@@ -179,29 +180,42 @@ export default function Report() {
           </View>
         )}
 
+        {usesInteraction(scale, 'rank') && (
+          <View className="report-card">
+            <Text className="report-section-title">各选项累计名次分</Text>
+            <Text className="tiny muted">每题按名次换算成分值（选项数 → 1），逐题累加</Text>
+            {rankTally(scale, answers).map((value, index) => {
+              const tallest = Math.max(1, ...rankTally(scale, answers));
+              const sample = questionOptions(scale, scale.questions[0])[index]?.label ?? `选项 ${index + 1}`;
+              return (
+                <View className="score" key={sample}>
+                  <View>
+                    <Text>{sample}</Text>
+                    <Text>{value} 分</Text>
+                  </View>
+                  <View className="bar">
+                    <View style={{ width: `${Math.round((value / tallest) * 100)}%` }} />
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+
         <View className="report-card">
           <Text className="report-section-title">作答回顾</Text>
-          <Text className="tiny muted">每题按量表原始计分呈现，反向计分题已折算</Text>
+          <Text className="tiny muted">按各题的作答交互还原你的选择</Text>
           {scale.questions.map((question, index) => {
-            const optionIndex = answers[index];
-            const option = optionIndex === null || optionIndex === undefined
-              ? undefined
-              : questionOptions(scale, question)[optionIndex];
-            const value = optionIndex === null || optionIndex === undefined
-              ? null
-              : questionScore(scale, question, optionIndex);
-
-            const letter = optionIndex === null || optionIndex === undefined
-              ? null
-              : question.letters?.[optionIndex] ?? null;
+            const answer = answers[index] ?? null;
+            const letter = typeof answer === 'number' && answer >= 0 ? question.letters?.[answer] ?? null : null;
 
             return (
               <View className="score" key={question.id}>
                 <View>
                   <Text>{question.id}. {question.text}</Text>
-                  <Text>{optionIndex === null || optionIndex === undefined ? "未作答" : letter ?? `${value} 分`}</Text>
+                  <Text>{letter ?? ''}</Text>
                 </View>
-                {option && <Text>{option.label}{question.reverse ? "（反向计分）" : ""}</Text>}
+                <Text>{summarizeAnswer(scale, question, answer)}</Text>
               </View>
             );
           })}
