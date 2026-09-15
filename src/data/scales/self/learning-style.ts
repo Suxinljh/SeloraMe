@@ -160,7 +160,7 @@ const scale: Scale = {
   dimensions: [
 
   ],
-  scoring: { kind: 'profile', profileNote: '本量表使用排序作答：每题把四个描述按符合程度排序，名次自动换算为 4/3/2/1 分。源文档未给出 A/B/C/D 与四阶段学习模式的对应表，故不合并为类型判定，结果以各选项的累计名次分呈现。' },
+  scoring: { kind: 'profile', profileNote: '本评测使用排序作答：每题把四个描述按符合程度排序，名次自动换算为 4/3/2/1 分。源文档未给出 A/B/C/D 与四阶段学习模式的对应表，故不合并为类型判定，结果以各选项的累计名次分呈现。' },
 }
 
 export default scale

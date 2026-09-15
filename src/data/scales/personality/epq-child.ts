@@ -11,15 +11,15 @@ const scale: Scale = {
   desc: '从内外向、神经质、精神质与掩饰性四个维度了解儿童的个性特征',
   category: 'personality',
   duration: '约 15 分钟',
-  tag: '专业量表',
+  tag: '专业评测',
   participantCount: 4458,
   price: '¥9.9',
   intro: [
     '艾森克儿童个性问卷（Eysenck Personality Questionnaire，儿童形式）是艾森克人格问卷的儿童版本。',
     '问卷从内外向 E、神经质（情绪稳定性）N、精神质（倔强性）P，以及掩饰 L 四个维度刻画儿童的个性结构。',
-    '本量表共 74 题，请根据孩子的实际情况依次回答。符合在括号内打「√」，不符打「×」，凭第一印象尽快作答。',
+    '本评测共 74 题，请根据孩子的实际情况依次回答。符合在括号内打「√」，不符打「×」，凭第一印象尽快作答。',
   ],
-  highlights: '四维个性结构｜E/N/P/L 量表｜儿童形式｜约 15 分钟',
+  highlights: '四维个性结构｜E/N/P/L 评测｜儿童形式｜约 15 分钟',
   benefits: [
     { title: '了解儿童个性', description: '从内外向、情绪稳定性、倔强性与掩饰程度四个维度刻画儿童的个性结构。' },
     { title: '识别情绪特点', description: '结合 N、P 维度，了解儿童情绪反应强度与行为风格，便于针对性引导。' },
@@ -145,7 +145,7 @@ const scale: Scale = {
       items: [6, 9, 13, 17, 21, 24, 27, 31, 36, 39, 43, 52, 56, 60, 62, 65, 69, 72, 74],
       bands: [
         { min: 0, max: 12, label: '正常', summary: '掩饰程度在正常范围，结果较可靠；也可能较成熟老练。', recommendation: '结果可作为个性参考。', tone: 'calm' },
-        { min: 13, max: 19, label: '掩饰倾向', summary: 'L 量表分偏高，显示有掩饰，或较成熟老练；它本身代表一种稳定的人格功能。', recommendation: '结合具体情境理解作答的真实性。', tone: 'calm' },
+        { min: 13, max: 19, label: '掩饰倾向', summary: 'L 评测分偏高，显示有掩饰，或较成熟老练；它本身代表一种稳定的人格功能。', recommendation: '结合具体情境理解作答的真实性。', tone: 'calm' },
       ],
     },
   ],

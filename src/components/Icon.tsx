@@ -45,7 +45,7 @@ export type IconVariant = 'round' | 'outlined'
 
 /**
  * outlined 形态覆盖表。键必须来自 icons，写错键名编译期即报错。
- * 注意：这里不能写成 `Record<IconName, string>`，因为只有少数量表图标提供 outlined 版本。
+ * 注意：这里不能写成 `Record<IconName, string>`，因为只有少数评测图标提供 outlined 版本。
  */
 const outlinedIcons: Partial<Record<IconName, string>> = {
   receipt: receiptOutlined,

@@ -1,4 +1,4 @@
-import { View, Text, Button, ScrollView, Image } from "@tarojs/components";
+import { View, Text, Button, Image } from "@tarojs/components";
 import Taro, { useDidShow } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
@@ -12,10 +12,10 @@ const categoryNames = SCALE_CATEGORIES.reduce<Record<string, string>>((acc, { ke
   return acc;
 }, {});
 
-/** 首页主推量表。其余推荐位在下方 featuredIds 中列出 */
+/** 首页主推评测。其余推荐位在下方 featuredIds 中列出 */
 const heroScaleId = "internal-friction";
 
-/** 推荐测评栏目展示的量表，按展示顺序排列 */
+/** 推荐测评栏目展示的评测，按展示顺序排列 */
 const featuredIds = [
   "mbti-93",
   "attachment",
@@ -31,7 +31,7 @@ const featuredIds = [
 const categoryEntries: Array<[string, string]> = [
   ["情绪心理", "emotion"],
   ["性格人格", "personality"],
-  ["专业量表", "professional"],
+  ["专业评测", "professional"],
   ["恋爱关系", "romance"],
   ["职场能力", "career"],
   ["生活状态", "lifestyle"],
@@ -61,7 +61,7 @@ export default function Home() {
       <View className="content">
         <View className="search home-search" onClick={() => Taro.navigateTo({ url: "/pages/search/index" })}>
           <Image src={searchIcon} className="search-icon" />
-          <Text>搜索测评，如 MBTI、霍兰德、焦虑指数...</Text>
+          <Text>搜索测评，如 16 型人格、霍兰德、焦虑...</Text>
         </View>
 
         {hero && (
@@ -93,7 +93,6 @@ export default function Home() {
           </View>
         )}
 
-        <ScrollView scrollX className="home-tabs-scroll">
           <View className="home-tabs">
             {categoryEntries.map(([label, category], i) => (
               <Text
@@ -106,7 +105,6 @@ export default function Home() {
               </Text>
             ))}
           </View>
-        </ScrollView>
 
         <View className="section-head">
           <Text className="section-title">推荐测评</Text>

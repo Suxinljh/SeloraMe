@@ -7,7 +7,7 @@ import ScaleCard from '../../components/ScaleCard'
 import { searchScales, type Scale } from '../../data/scales'
 
 /**
- * 量表搜索页。
+ * 评测搜索页。
  *
  * 匹配范围只含标题与描述（见 data/scales 的 searchScales），
  * 不涉及介绍正文、分类、标签，避免结果发散。
@@ -16,7 +16,7 @@ import { searchScales, type Scale } from '../../data/scales'
 
 /**
  * 空关键词时展示的热门词，点击后直接填入搜索框。
- * 这些词均已核对过能在标题或描述中命中量表，避免点进去是空结果。
+ * 这些词均已核对过能在标题或描述中命中评测，避免点进去是空结果。
  */
 const hotKeywords = ['MBTI', '霍兰德', '性格', '情绪', '焦虑', '抑郁', '职业', '依恋', '学习', '心理健康']
 
@@ -65,7 +65,7 @@ export default function Search () {
         {trimmed.length > 0 && (
           <View className='list-head'>
             <Text className='list-heading'>搜索结果</Text>
-            <Text className='list-head-count'>{results.length} 个量表</Text>
+            <Text className='list-head-count'>{results.length} 个评测</Text>
           </View>
         )}
 
@@ -77,8 +77,8 @@ export default function Search () {
           {trimmed.length > 0 && results.length === 0 && (
             <View className='search-empty'>
               <Icon name='search' className='search-empty-icon' />
-              <Text className='search-empty-title'>没有找到「{trimmed}」相关的量表</Text>
-              <Text className='search-empty-hint'>换个词试试，或者到分类页浏览全部量表</Text>
+              <Text className='search-empty-title'>没有找到「{trimmed}」相关的评测</Text>
+              <Text className='search-empty-hint'>换个词试试，或者到分类页浏览全部评测</Text>
             </View>
           )}
         </View>

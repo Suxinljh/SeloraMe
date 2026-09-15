@@ -1,12 +1,12 @@
 /**
- * 量表封面图。
+ * 评测封面图。
  *
  * 图片存放于 R2 对象存储，经 https://app.ljhsu.xin/selorame/ 提供。
  *
  * 注意：
  * - 微信小程序加载网络图片要求 HTTPS，且域名需在小程序后台配置为
  *   downloadFile 合法域名，否则正式环境不会加载。
- * - 未配置封面的量表 coverFor 返回 undefined，页面需自行降级（不渲染图片区域）。
+ * - 未配置封面的评测 coverFor 返回 undefined，页面需自行降级（不渲染图片区域）。
  */
 
 const R2_BASE = 'https://app.ljhsu.xin/selorame/'
@@ -39,13 +39,13 @@ const coverFiles: Record<string, string> = {
   disc: 'seloramedataimg-mbti-11.webp',
 }
 
-/** 取量表封面图 URL，无封面时返回 undefined */
+/** 取评测封面图 URL，无封面时返回 undefined */
 export const coverFor = (scaleId: string): string | undefined => {
   const file = coverFiles[scaleId]
   return file ? `${R2_BASE}${file}` : undefined
 }
 
-/** 已配置封面的量表 id，供列表页筛选使用 */
+/** 已配置封面的评测 id，供列表页筛选使用 */
 export const coveredScaleIds = (): string[] => Object.keys(coverFiles)
 
 /** 封面图基址，供后续扩展或调试 */

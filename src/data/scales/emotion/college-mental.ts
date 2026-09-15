@@ -14,7 +14,7 @@ const scale: Scale = {
   desc: '从多维度了解自己的心理健康状况',
   category: 'emotion',
   duration: '约 10 分钟',
-  tag: '经典量表',
+  tag: '经典评测',
   participantCount: 5706,
   intro: [
     '本表用于帮助大学生了解自身心理健康状况，共 70 题，涵盖情绪、躯体、人际等多个侧面。',

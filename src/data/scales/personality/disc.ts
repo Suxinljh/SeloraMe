@@ -29,7 +29,7 @@ const scale: Scale = {
   desc: '支配、影响、稳健、谨慎四因子剖析，了解你的行为风格与职场特质',
   category: 'personality',
   duration: '约 10 分钟',
-  tag: '经典量表',
+  tag: '经典评测',
   participantCount: 269791,
   price: '¥9.9',
   intro: [
@@ -417,7 +417,7 @@ const scale: Scale = {
     { key: 's', name: '稳健 S', items: [] },
     { key: 'c', name: '谨慎 C', items: [] },
   ],
-  scoring: { kind: 'profile', profileNote: '本量表不计算总分。每题从四个描述中选出一个最符合自己的，被选中描述所属类型（D 支配 / I 影响 / S 稳健 / C 谨慎）累计加一，计数最高者为主导类型。' },
+  scoring: { kind: 'profile', profileNote: '本评测不计算总分。每题从四个描述中选出一个最符合自己的，被选中描述所属类型（D 支配 / I 影响 / S 稳健 / C 谨慎）累计加一，计数最高者为主导类型。' },
 }
 
 export default scale

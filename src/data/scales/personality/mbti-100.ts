@@ -6,7 +6,7 @@ import type { Scale } from '../types'
 const scale: Scale = {
   id: 'mbti-100',
   title: '16 型人格倾向测评 · 专业版',
-  desc: '100 题细分量表，含情境题与词汇对照',
+  desc: '100 题细分评测，含情境题与词汇对照',
   category: 'personality',
   duration: '约 20 分钟',
   tag: '专业版',
@@ -638,7 +638,7 @@ const scale: Scale = {
   ],
   scoring: {
     kind: 'profile',
-    profileNote: '本量表不计算总分。四个维度各自比较两极被选中的次数，取较高的一极组合成四位类型代码；维度百分比表示该倾向的明确程度，越接近 50% 说明两端越均衡。',
+    profileNote: '本评测不计算总分。四个维度各自比较两极被选中的次数，取较高的一极组合成四位类型代码；维度百分比表示该倾向的明确程度，越接近 50% 说明两端越均衡。',
   },
 }
 

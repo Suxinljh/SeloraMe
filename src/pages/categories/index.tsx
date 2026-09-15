@@ -30,14 +30,14 @@ const categoryIcons: Record<ScaleCategory, string> = {
 };
 
 const hotTags = [
-  "MBTI深度版",
+  "16 型人格",
   "霍兰德职业兴趣",
-  "抑郁倾向筛查",
+  "抑郁",
   "艾森克人格",
-  "焦虑自评量表",
-  "成人依恋类型",
+  "焦虑",
+  "依恋",
   "中医体质",
-  "情商测评",
+  "情商",
 ];
 
 export default function Categories() {
@@ -45,7 +45,7 @@ export default function Categories() {
 
   const goToList = (key: ScaleCategory, count: number) => {
     if (count === 0) {
-      Taro.showToast({ title: "该分类量表正在筹备中", icon: "none" });
+      Taro.showToast({ title: "该分类评测正在筹备中", icon: "none" });
       return;
     }
     Taro.navigateTo({ url: `/pages/assessment-list/index?category=${key}` });
@@ -83,7 +83,7 @@ export default function Categories() {
                 <View className="categories-card-copy">
                   <Text className="categories-card-name">{name}</Text>
                   <Text className="categories-card-count">
-                    {empty ? "筹备中" : `${count} 个量表`}
+                    {empty ? "筹备中" : `${count} 个评测`}
                   </Text>
                 </View>
                 <View className="categories-card-icon-wrap">

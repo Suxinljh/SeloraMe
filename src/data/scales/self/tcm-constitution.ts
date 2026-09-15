@@ -12,7 +12,7 @@ import type { Scale } from '../types'
 // 5级评分数字在提取中缺失，但该题属于标准5级题，选项与计分同本量表统一方案。
 const scale: Scale = {
   id: 'tcm-constitution',
-  title: '中医体质量表',
+  title: '中医体质评测',
   desc: '辨识中医九种体质类型',
   category: 'self',
   duration: '约 12 分钟',

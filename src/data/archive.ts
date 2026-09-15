@@ -11,7 +11,7 @@ const dateText = (time: number) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-/** 读取全部量表在本地留下的作答进度 */
+/** 读取全部评测在本地留下的作答进度 */
 const readProgress = () =>
   allScales.map((scale) => {
     const session = peekSession(scale.id)

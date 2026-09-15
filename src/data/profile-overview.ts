@@ -15,7 +15,7 @@ export type ProfileOverview = {
   topics: ProfileTopic[]
 }
 
-/** 已完成量表的作答，转换为维度得分并汇总为「关注主题」 */
+/** 已完成评测的作答，转换为维度得分并汇总为「关注主题」 */
 const collectTopics = (): ProfileTopic[] => {
   const topics: ProfileTopic[] = []
 

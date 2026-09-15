@@ -51,7 +51,7 @@ export default function Report() {
         <Nav back />
         <View className="report-content">
           <View className="report-card">
-            <Text className="report-section-title">未找到该量表</Text>
+            <Text className="report-section-title">未找到该评测</Text>
           </View>
         </View>
       </View>
@@ -61,7 +61,7 @@ export default function Report() {
   const result = scoreAnswers(scale, answers);
 
   /**
-   * 字母型量表（16 型、DISC）：类型由各极累计得分决定，不按选项分值计分。
+   * 字母型评测（16 型、DISC）：类型由各极累计得分决定，不按选项分值计分。
    * 用 poleTally 而非 letterCounts —— 前者支持两端多刻度题（32 题快速版），
    * 选项按下标加权；A/B 二选一题型在其下退化为给所选那一极记 1 分。
    */
@@ -76,7 +76,7 @@ export default function Report() {
     : isDisc ? topLetter(tally, DISC_LETTERS) : '';
   const typeInfo = isMbti ? mbtiTypeInfo(typeCode) : undefined;
   const letterMode = poleMode;
-  /** 深度内容是否上锁：标价量表未解锁时隐藏维度分布、解读与作答回顾 */
+  /** 深度内容是否上锁：标价评测未解锁时隐藏维度分布、解读与作答回顾 */
   const locked = requiresUnlock(scale) && !unlocked;
 
   const bandValue = scale.scoring.kind === "average" ? result.average : result.total;
@@ -123,12 +123,12 @@ export default function Report() {
             <Text className="phq-eyebrow">{isMbti ? "你的类型代码" : "你的主导类型"}</Text>
             <Text className="report-type">{typeCode}</Text>
             <Text className="phq-severity">{typeInfo ? `${typeInfo.name} · ${typeInfo.nick}` : letterLabelOf(typeCode[0] ?? "")}</Text>
-            <Text className="phq-summary">{scale.scoring.profileNote ?? "本量表不计算总分，结果由各类型被选中的次数决定。"}</Text>
+            <Text className="phq-summary">{scale.scoring.profileNote ?? "本评测不计算总分，结果由各类型被选中的次数决定。"}</Text>
           </View>
         ) : scale.scoring.kind === "profile" ? (
           <View className="phq-summary-card phq-calm">
-            <Text className="phq-eyebrow">多维剖析型量表</Text>
-            <Text className="phq-severity">本量表不计算总分</Text>
+            <Text className="phq-eyebrow">多维剖析型评测</Text>
+            <Text className="phq-severity">本评测不计算总分</Text>
             <Text className="phq-summary">{scale.scoring.profileNote ?? "结果以各维度得分的组合形态呈现，请参考下方维度明细。"}</Text>
           </View>
         ) : (
@@ -141,7 +141,7 @@ export default function Report() {
             <Text className="phq-severity">{band?.label ?? "已完成"}</Text>
             {band && <Text className="phq-range">{band.summary}</Text>}
             {band && <Text className="phq-summary">{band.recommendation}</Text>}
-            {!band && <Text className="phq-summary">该量表源文档未给出明确的分界值，因此不展示分级。可在下方查看各维度得分。</Text>}
+            {!band && <Text className="phq-summary">该评测源文档未给出明确的分界值，因此不展示分级。可在下方查看各维度得分。</Text>}
           </View>
         )}
 
@@ -289,7 +289,7 @@ export default function Report() {
         <View className="phq-disclaimer">
           <Text>重要提示</Text>
           <Text>{scale.disclaimer ?? defaultDisclaimer}</Text>
-          {scale.source && <Text>量表来源：{scale.source}</Text>}
+          {scale.source && <Text>评测来源：{scale.source}</Text>}
         </View>
       </View>
 

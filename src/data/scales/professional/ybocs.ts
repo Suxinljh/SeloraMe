@@ -36,16 +36,16 @@ import type { Scale } from '../types'
 // 源文档为临床半结构化访谈提纲，此处按自评形式呈现，结果不构成临床诊断。
 const scale: Scale = {
   id: 'ybocs',
-  title: 'Yale-Brown 强迫量表',
-  desc: '评估强迫思维与强迫行为严重程度的半结构式量表',
+  title: 'Yale-Brown 强迫评测',
+  desc: '评估强迫思维与强迫行为严重程度的半结构式评测',
   category: 'professional',
   duration: '约 10 分钟',
-  tag: '专业量表',
+  tag: '专业评测',
   participantCount: 7,
   intro: [
-    '耶鲁布朗强迫症严重程度量表（Yale-Brown Obsessive Compulsive Scale, Y-BOCS）在国内外研究和实践中普遍使用，其结果具有权威性的参考意义。',
-    '量表分为强迫思维与强迫行为两个部分，各 5 题，每题按 0-4 五级评分，两部分分别求和并合计总分。',
-    '本量表用于自评与筛查，不构成临床诊断。',
+    '耶鲁布朗强迫症严重程度评测（Yale-Brown Obsessive Compulsive Scale, Y-BOCS）在国内外研究和实践中普遍使用，其结果具有权威性的参考意义。',
+    '评测分为强迫思维与强迫行为两个部分，各 5 题，每题按 0-4 五级评分，两部分分别求和并合计总分。',
+    '本评测用于自评与筛查，不构成临床诊断。',
   ],
   highlights: '10 题｜五级评分｜思维+行为两维度｜专业筛查',
   benefits: [
@@ -56,7 +56,7 @@ const scale: Scale = {
   instructions: [
     '请仔细阅读每题及该题 0-4 的具体锚定描述，选择最贴合自己近期情况的等级。',
     '强迫思维（第 1-5 题）与强迫行为（第 6-10 题）各题分别计 0-4 分，两部分分别求和。',
-    '本量表用于自评与筛查，不构成临床诊断；若总分或维度分偏高，建议寻求专业评估。',
+    '本评测用于自评与筛查，不构成临床诊断；若总分或维度分偏高，建议寻求专业评估。',
   ],
   source: 'Yale-Brown Obsessive Compulsive Scale（Y-BOCS）· Goodman 等',
   questions: [
@@ -165,7 +165,7 @@ const scale: Scale = {
       { min: 15, max: 40, label: '重度强迫行为', summary: '强迫行为负担较重，已明显影响功能。', recommendation: '建议尽快寻求专业评估与治疗，并对强迫行为的严重程度做更深入的临床评估。', tone: 'urgent' },
     ] },
   ],
-  scoring: { kind: 'sum', profileNote: '本量表按强迫思维与强迫行为两个维度分别计分，各维度 0～20 分，不合并为单一总分。' },
+  scoring: { kind: 'sum', profileNote: '本评测按强迫思维与强迫行为两个维度分别计分，各维度 0～20 分，不合并为单一总分。' },
 }
 
 export default scale

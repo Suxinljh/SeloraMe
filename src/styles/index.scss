@@ -79,7 +79,10 @@ image {
     box-sizing: border-box;
 }
 .page {
+    width: 100%;
+    max-width: 100%;
     min-height: 100vh;
+    overflow-x: hidden;
     background: $bg;
     padding-bottom: 150px;
 }
@@ -148,8 +151,13 @@ image {
     font-size: 26px;
 }
 .chip-row {
-    white-space: nowrap;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     padding: 16px 32px;
+}
+.chip-row .chip {
+    margin-right: 0;
 }
 .chip {
     display: inline-block;
@@ -294,8 +302,13 @@ image {
     height: 256px;
 }
 .home-tabs {
-    white-space: nowrap;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     margin: 16px 0;
+}
+.home-tabs .home-chip {
+    flex: none;
 }
 .home-chip {
     display: inline-block;
@@ -357,6 +370,10 @@ image {
     font-size: 28px;
     line-height: 40px;
     font-weight: 600;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
 }
 .feature-desc {
     height: 58px;
@@ -375,14 +392,14 @@ image {
     font-size: 21px;
 }
 .green {
-    color: #106d20;
-    font-size: 28px;
-    font-weight: 500;
+    color: $muted;
+    font-size: 21px;
+
 }
 .price {
-    color: #1c1b1f;
-    font-size: 28px;
-    font-weight: 500;
+    color: $muted;
+    font-size: 21px;
+
 }
 .quote {
     margin: 32px 0;
@@ -530,7 +547,6 @@ image {
     flex: 1;
     flex-direction: column;
     justify-content: center;
-    padding-right: 196px;
 }
 .categories-section-head {
     display: flex;
@@ -681,7 +697,6 @@ image {
     font-size: 24px;
     font-weight: 500;
     line-height: 36px;
-    white-space: nowrap;
 }
 .categories-suggest-button {
     margin: 0;
@@ -2392,13 +2407,8 @@ image {
         brightness(91%) contrast(93%);
 }
 
-.home-tabs-scroll {
-    white-space: nowrap;
-}
-.home-tabs-scroll .home-tabs {
-    margin: 0;
+.home-tabs {
     padding: 32px 0;
-    white-space: nowrap;
 }
 
 // The report artwork uses a @2x source. These are logical, 390-wide layout
@@ -2957,7 +2967,7 @@ image {
     display: flex;
     justify-content: space-between;
     gap: 24px;
-    margin: 0 8px 20px;
+    margin: 0 0 20px;
 }
 .quiz-scale-label {
     flex: 1;
@@ -2971,8 +2981,7 @@ image {
 .quiz-scale-buttons {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
+    justify-content: space-between;
 }
 .quiz-scale-btn {
     display: flex;

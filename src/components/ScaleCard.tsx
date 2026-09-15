@@ -3,7 +3,7 @@ import Icon from './Icon'
 import { formatParticipants, matchRange, type Scale } from '../data/scales'
 
 /**
- * 量表卡片。分类列表页与搜索结果页共用，保证两处展示完全一致。
+ * 评测卡片。分类列表页与搜索结果页共用，保证两处展示完全一致。
  *
  * 右下角统一展示已测人数。付费改为「基础结果免费 + 深度报告付费」后，
  * 卡片不再显示价格，避免在入口就形成付费阻力。

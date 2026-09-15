@@ -4,8 +4,8 @@ import type { Scale } from '../data/scales'
 /**
  * 积分与报告解锁。
  *
- * 计价规则：1 积分 = 1 元。解锁一份详细报告所需积分等于该量表的标价数值，
- * 例如标价 ¥9.9 的量表需要 9.9 积分。未标价的量表免费，无需解锁。
+ * 计价规则：1 积分 = 1 元。解锁一份详细报告所需积分等于该评测的标价数值，
+ * 例如标价 ¥9.9 的评测需要 9.9 积分。未标价的评测免费，无需解锁。
  *
  * 当前只实现「余额 + 解锁记录」的本地存储与扣减逻辑；
  * 充值（微信支付等）尚未接入，接入后调用 addPoints 即可。
@@ -22,7 +22,7 @@ export const pointsCostOf = (scale: Scale): number => {
   return Number.isFinite(value) ? value : 0
 }
 
-/** 该量表的详细报告是否需要付费解锁 */
+/** 该评测的详细报告是否需要付费解锁 */
 export const requiresUnlock = (scale: Scale): boolean => pointsCostOf(scale) > 0
 
 export function getPoints (): number {
@@ -42,7 +42,7 @@ export function getUnlockedReportIds (): string[] {
   return Array.isArray(value) && value.every((id) => typeof id === 'string') ? value : []
 }
 
-/** 该量表的详细报告是否已解锁 */
+/** 该评测的详细报告是否已解锁 */
 export function isReportUnlocked (scaleId: string): boolean {
   return getUnlockedReportIds().includes(scaleId)
 }

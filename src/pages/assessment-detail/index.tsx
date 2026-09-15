@@ -27,7 +27,7 @@ export default function AssessmentDetail () {
       <Nav back light />
       <View className='assessment-detail-content'>
         <View className='assessment-detail-empty'>
-          <Text>未找到该量表</Text>
+          <Text>未找到该评测</Text>
           <Text>它可能已被移除，请返回列表重新选择。</Text>
         </View>
       </View>
@@ -101,7 +101,7 @@ export default function AssessmentDetail () {
       {scale.source && <View className='assessment-detail-source-note'>
         <Icon name='badge' className='assessment-detail-source-icon' />
         <View>
-          <Text>量表来源</Text>
+          <Text>评测来源</Text>
           <Text>{scale.source}</Text>
         </View>
       </View>}

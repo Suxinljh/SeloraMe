@@ -41,7 +41,7 @@ export default function Questions() {
         <Nav back />
         <View className="quiz-body">
           <View className="quiz-question-card">
-            <Text className="question-title">未找到该量表</Text>
+            <Text className="question-title">未找到该评测</Text>
           </View>
         </View>
       </View>
