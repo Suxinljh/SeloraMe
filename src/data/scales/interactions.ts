@@ -14,6 +14,7 @@ export const INTERACTION_LABELS: Record<QuizInteractionKind, string> = {
   multiple: '多选',
   rank: '排序',
   match: '配对',
+  scale: '程度选择',
 }
 
 /** 取该题实际生效的交互类型，未声明时按单选 */
@@ -35,7 +36,7 @@ export const isAnswered = (scale: Scale, question: ScaleQuestion, answer: QuizAn
   const interaction = interactionOf(question)
   const optionCount = questionOptions(scale, question).length
 
-  if (interaction.kind === 'single') {
+  if (interaction.kind === 'single' || interaction.kind === 'scale') {
     return typeof answer === 'number' && answer >= 0 && answer < optionCount
   }
   if (interaction.kind === 'multiple') {
@@ -62,6 +63,7 @@ export const incompleteHint = (question: ScaleQuestion): string => {
   if (interaction.kind === 'multiple') return `请至少选择 ${interaction.min ?? 1} 项后继续`
   if (interaction.kind === 'rank') return '请把全部选项排序后继续'
   if (interaction.kind === 'match') return '请完成全部配对后继续'
+  if (interaction.kind === 'scale') return '请在刻度上选择一个位置后继续'
   return '请选择一项后继续'
 }
 
@@ -87,7 +89,7 @@ export const scoreQuestion = (scale: Scale, question: ScaleQuestion, answer: Qui
   const interaction = interactionOf(question)
   const options = questionOptions(scale, question)
 
-  if (interaction.kind === 'single') {
+  if (interaction.kind === 'single' || interaction.kind === 'scale') {
     return typeof answer === 'number' && answer >= 0 ? questionScore(scale, question, answer) : 0
   }
   if (interaction.kind === 'multiple') {
@@ -114,6 +116,12 @@ export const summarizeAnswer = (scale: Scale, question: ScaleQuestion, answer: Q
   if (interaction.kind === 'single') {
     if (typeof answer !== 'number' || answer < 0) return '未作答'
     return `${labelOf(answer)}${question.reverse ? '（反向计分）' : ''}`
+  }
+  if (interaction.kind === 'scale') {
+    if (typeof answer !== 'number' || answer < 0) return '未作答'
+    const bounds = question.endpoints
+    const pole = bounds ? `（${bounds.low} ←→ ${bounds.high}）` : ''
+    return `${labelOf(answer)} / ${options.length} 点${pole}`
   }
   if (interaction.kind === 'multiple') {
     if (!Array.isArray(answer) || answer.length === 0) return '未作答'
@@ -203,6 +211,53 @@ export const rankTally = (scale: Scale, answers: QuizAnswers): number[] => {
   })
   return tally
 }
+
+/**
+ * 按「极」累计字母得分，用于双向题的 16 型类型判定。
+ *
+ * 与 letterCounts 的区别：letterCounts 每次选中只记 1 分，
+ * 而这里按选项所处刻度位置加权 —— 选项下标 i 给 high 端记 i 分、给 low 端记 (n-1-i) 分。
+ * n=2（A/B 二选一）时退化为给所选那一极记 1 分；
+ * n=5（两端五刻度）时中间点两边各半，与 OEJTS 的计分方式一致。
+ */
+export const poleTally = (scale: Scale, answers: QuizAnswers): Record<string, number> => {
+  const tally: Record<string, number> = {}
+  const add = (letter: string | undefined, value: number) => {
+    if (!letter || value === 0) return
+    tally[letter] = (tally[letter] ?? 0) + value
+  }
+
+  scale.questions.forEach((question, index) => {
+    const answer = answers[index]
+    if (typeof answer !== 'number' || answer < 0) return
+    const count = questionOptions(scale, question).length
+    if (count === 0) return
+
+    if (question.poles) {
+      add(question.poles.low, count - 1 - answer)
+      add(question.poles.high, answer)
+      return
+    }
+    add(question.letters?.[answer], 1)
+  })
+
+  return tally
+}
+
+/** 两组极各自的百分比，取较高一侧作为类型码 */
+export const polePercents = (
+  tally: Record<string, number>,
+  pairs: Array<[string, string]>,
+): Array<{ first: string; second: string; firstPercent: number; secondPercent: number; winner: string }> =>
+  pairs.map(([first, second]) => {
+    const total = (tally[first] ?? 0) + (tally[second] ?? 0)
+    const firstPercent = total > 0 ? Math.round(((tally[first] ?? 0) / total) * 100) : 50
+    const secondPercent = 100 - firstPercent
+    return { first, second, firstPercent, secondPercent, winner: firstPercent >= secondPercent ? first : second }
+  })
+
+/** MBTI 四个维度的极对，顺序固定 */
+export const MBTI_PAIRS: Array<[string, string]> = [['E', 'I'], ['S', 'N'], ['T', 'F'], ['J', 'P']]
 
 /** 量表是否使用了某种交互 */
 export const usesInteraction = (scale: Scale, kind: QuizInteractionKind): boolean =>

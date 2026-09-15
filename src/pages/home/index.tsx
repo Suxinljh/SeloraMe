@@ -3,7 +3,7 @@ import Taro, { useDidShow } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
 import searchIcon from "../../assets/figma/home-search.svg";
-import { getScale, isFreeScale, priceLabelOf, SCALE_CATEGORIES, type Scale } from "../../data/scales";
+import { getScale, SCALE_CATEGORIES, type Scale } from "../../data/scales";
 import { coverFor } from "../../data/covers";
 import { setActiveTab } from "../../utils/custom-tabbar";
 
@@ -17,7 +17,7 @@ const heroScaleId = "internal-friction";
 
 /** 推荐测评栏目展示的量表，按展示顺序排列 */
 const featuredIds = [
-  "mbti",
+  "mbti-93",
   "attachment",
   "major-choice",
   "phq-9",
@@ -137,7 +137,7 @@ export default function Home() {
                     <Icon name="schedule" className="meta-icon" />
                     {scale.duration}
                   </Text>
-                  <Text className={isFreeScale(scale) ? 'green' : 'price'}>{priceLabelOf(scale)}</Text>
+                  <Text className='green'>{scale.participants}</Text>
                 </View>
               </View>
             );

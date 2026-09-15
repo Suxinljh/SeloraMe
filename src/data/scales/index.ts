@@ -10,7 +10,9 @@ import mhrsp from './professional/mhrsp'
 import ybocs from './professional/ybocs'
 
 // 性格人格
-import mbti from './personality/mbti'
+import mbti32 from './personality/mbti-32'
+import mbti93 from './personality/mbti-93'
+import mbti100 from './personality/mbti-100'
 import disc from './personality/disc'
 import epq from './personality/epq'
 import epqChild from './personality/epq-child'
@@ -61,7 +63,9 @@ export const allScales: Scale[] = [
   mssmhs,
   mhrsp,
   ybocs,
-  mbti,
+  mbti32,
+  mbti93,
+  mbti100,
   disc,
   epq,
   epqChild,

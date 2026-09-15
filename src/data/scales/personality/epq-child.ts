@@ -13,6 +13,7 @@ const scale: Scale = {
   duration: '约 15 分钟',
   tag: '专业量表',
   participants: '持续更新中',
+  price: '¥9.9',
   intro: [
     '艾森克儿童个性问卷（Eysenck Personality Questionnaire，儿童形式）是艾森克人格问卷的儿童版本。',
     '问卷从内外向 E、神经质（情绪稳定性）N、精神质（倔强性）P，以及掩饰 L 四个维度刻画儿童的个性结构。',

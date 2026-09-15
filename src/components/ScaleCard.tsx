@@ -1,12 +1,12 @@
 import { Text, View } from '@tarojs/components'
 import Icon from './Icon'
-import { isFreeScale, matchRange, priceLabelOf, type Scale } from '../data/scales'
+import { matchRange, type Scale } from '../data/scales'
 
 /**
  * 量表卡片。分类列表页与搜索结果页共用，保证两处展示完全一致。
  *
- * 右下角统一展示价格：免费为绿色「免费」，收费为黑色价格文案。
- * 价格规则只在这里和首页推荐卡各用一次，改动时两处同步。
+ * 右下角统一展示已测人数。付费改为「基础结果免费 + 深度报告付费」后，
+ * 卡片不再显示价格，避免在入口就形成付费阻力。
  */
 
 /** 把命中片段拆成三段渲染，用于搜索结果高亮。未传关键词时原样输出 */
@@ -35,7 +35,7 @@ export default function ScaleCard ({ scale, keyword = '', onClick }: { scale: Sc
       </View>
       <View className='assessment-bottom'>
         <Text className='tag'>{scale.tag}</Text>
-        <Text className={isFreeScale(scale) ? 'green' : 'price'}>{priceLabelOf(scale)}</Text>
+        <Text className='green'>{scale.participants}</Text>
       </View>
     </View>
   )

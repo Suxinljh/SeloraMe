@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Button, Text, View } from "@tarojs/components";
-import Taro, { useLoad } from "@tarojs/taro";
+import Taro, { useDidShow, useLoad } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
-import { getScale, letterCounts, maxOptionScore, mbtiType, questionOptions, rankTally, resolveBand, scoreAnswers, summarizeAnswer, topLetter, usesInteraction, LETTER_LABELS, DISC_LABELS, type QuizAnswers, type Scale } from "../../data/scales";
+import { getScale, maxOptionScore, polePercents, poleTally, questionOptions, rankTally, resolveBand, scoreAnswers, summarizeAnswer, topLetter, usesInteraction, LETTER_LABELS, DISC_LABELS, MBTI_PAIRS, type QuizAnswers, type Scale } from "../../data/scales";
+import { mbtiTypeInfo } from "../../data/scales/personality/mbti-types";
+import UnlockSheet from "../../components/UnlockSheet";
 import { getSession, resetSession } from "../../store/session";
+import { getPoints, isReportUnlocked, pointsCostOf, requiresUnlock, unlockReport } from "../../store/purchase";
 
 const MBTI_LETTERS = ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P']
 const DISC_LETTERS = ['D', 'I', 'S', 'C']
@@ -20,6 +23,9 @@ export default function Report() {
   const [scaleId, setScaleId] = useState("");
   const [answers, setAnswers] = useState<QuizAnswers>([]);
   const [completedAt, setCompletedAt] = useState<number | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [sheetVisible, setSheetVisible] = useState(false);
 
   useLoad((options) => {
     const id = typeof options.assessment === "string" ? options.assessment : "phq-9";
@@ -30,6 +36,12 @@ export default function Report() {
     setAnswers(session.answers);
     setCompletedAt(session.completedAt);
   });
+
+  const refreshPurchase = () => {
+    setBalance(getPoints());
+    setUnlocked(isReportUnlocked(scaleId));
+  };
+  useDidShow(refreshPurchase);
 
   const scale: Scale | undefined = getScale(scaleId);
 
@@ -48,13 +60,24 @@ export default function Report() {
 
   const result = scoreAnswers(scale, answers);
 
-  /** 字母型量表（MBTI / DISC）：类型由被选中的字母计数决定，不按选项分值计分 */
-  const letterMode = scale.questions.some((question) => (question.letters?.length ?? 0) > 0);
-  const counts = letterMode ? letterCounts(scale, answers) : {};
-  const usedLetters = LETTER_ORDER.filter((letter) => (counts[letter] ?? 0) > 0);
-  const isMbti = letterMode && usedLetters.every((letter) => MBTI_LETTERS.includes(letter));
-  const isDisc = letterMode && usedLetters.every((letter) => DISC_LETTERS.includes(letter));
-  const typeCode = isMbti ? mbtiType(counts) : isDisc ? topLetter(counts, DISC_LETTERS) : '';
+  /**
+   * 字母型量表（16 型、DISC）：类型由各极累计得分决定，不按选项分值计分。
+   * 用 poleTally 而非 letterCounts —— 前者支持两端多刻度题（32 题快速版），
+   * 选项按下标加权；A/B 二选一题型在其下退化为给所选那一极记 1 分。
+   */
+  const poleMode = scale.questions.some((question) => question.poles !== undefined || (question.letters?.length ?? 0) > 0);
+  const tally = poleMode ? poleTally(scale, answers) : {};
+  const usedLetters = Object.keys(tally).filter((letter) => (tally[letter] ?? 0) > 0);
+  const isMbti = poleMode && usedLetters.length > 0 && usedLetters.every((letter) => MBTI_LETTERS.includes(letter));
+  const isDisc = poleMode && usedLetters.length > 0 && usedLetters.every((letter) => DISC_LETTERS.includes(letter));
+  const mbtiPercents = isMbti ? polePercents(tally, MBTI_PAIRS) : [];
+  const typeCode = isMbti
+    ? mbtiPercents.map((item) => item.winner).join('')
+    : isDisc ? topLetter(tally, DISC_LETTERS) : '';
+  const typeInfo = isMbti ? mbtiTypeInfo(typeCode) : undefined;
+  const letterMode = poleMode;
+  /** 深度内容是否上锁：标价量表未解锁时隐藏维度分布、解读与作答回顾 */
+  const locked = requiresUnlock(scale) && !unlocked;
 
   const bandValue = scale.scoring.kind === "average" ? result.average : result.total;
   const band = resolveBand(scale.scoring.bands, bandValue);
@@ -99,7 +122,7 @@ export default function Report() {
           <View className="phq-summary-card phq-calm">
             <Text className="phq-eyebrow">{isMbti ? "你的类型代码" : "你的主导类型"}</Text>
             <Text className="report-type">{typeCode}</Text>
-            <Text className="phq-severity">{letterLabelOf(typeCode[0] ?? "")}</Text>
+            <Text className="phq-severity">{typeInfo ? `${typeInfo.name} · ${typeInfo.nick}` : letterLabelOf(typeCode[0] ?? "")}</Text>
             <Text className="phq-summary">{scale.scoring.profileNote ?? "本量表不计算总分，结果由各类型被选中的次数决定。"}</Text>
           </View>
         ) : scale.scoring.kind === "profile" ? (
@@ -132,29 +155,42 @@ export default function Report() {
           </View>
         )}
 
-        {letterMode && (
+        {!locked && letterMode && (
           <View className="report-card">
-            <Text className="report-section-title">各类型选择次数</Text>
-            <Text className="tiny muted">被选中次数最多的类型即你的主导倾向</Text>
-            {LETTER_ORDER.filter((letter) => (counts[letter] ?? 0) > 0 || (isMbti ? MBTI_LETTERS : DISC_LETTERS).includes(letter)).map((letter) => {
-              const value = counts[letter] ?? 0;
-              const maxValue = Math.max(1, ...Object.values(counts));
-              return (
-                <View className="score" key={letter}>
-                  <View>
-                    <Text>{letterLabelOf(letter)}</Text>
-                    <Text>{value} 次</Text>
+            <Text className="report-section-title">{isMbti ? "四维倾向分布" : "各类型选择次数"}</Text>
+            <Text className="tiny muted">{isMbti ? "越接近 50% 说明该维度两端越均衡" : "被选中次数最多的类型即你的主导倾向"}</Text>
+            {isMbti
+              ? mbtiPercents.map((item) => (
+                  <View className="score" key={item.first}>
+                    <View>
+                      <Text>{letterLabelOf(item.first)} / {letterLabelOf(item.second)}</Text>
+                      <Text>{item.firstPercent}% : {item.secondPercent}%</Text>
+                    </View>
+                    <View className="bar">
+                      <View style={{ width: `${item.firstPercent}%` }} />
+                    </View>
+                    <Text>{item.winner} 倾向更明显</Text>
                   </View>
-                  <View className="bar">
-                    <View style={{ width: `${Math.round((value / maxValue) * 100)}%` }} />
-                  </View>
-                </View>
-              );
-            })}
+                ))
+              : DISC_LETTERS.filter((letter) => (tally[letter] ?? 0) > 0).map((letter) => {
+                  const value = tally[letter] ?? 0;
+                  const maxValue = Math.max(1, ...DISC_LETTERS.map((item) => tally[item] ?? 0));
+                  return (
+                    <View className="score" key={letter}>
+                      <View>
+                        <Text>{letterLabelOf(letter)}</Text>
+                        <Text>{value} 次</Text>
+                      </View>
+                      <View className="bar">
+                        <View style={{ width: `${Math.round((value / maxValue) * 100)}%` }} />
+                      </View>
+                    </View>
+                  );
+                })}
           </View>
         )}
 
-        {!letterMode && scale.dimensions.length > 0 && (
+        {!locked && !letterMode && scale.dimensions.length > 0 && (
           <View className="report-card">
             <Text className="report-section-title">维度明细</Text>
             <Text className="tiny muted">各维度得分越高，表示该维度描述的特征越明显</Text>
@@ -180,7 +216,7 @@ export default function Report() {
           </View>
         )}
 
-        {usesInteraction(scale, 'rank') && (
+        {!locked && usesInteraction(scale, 'rank') && (
           <View className="report-card">
             <Text className="report-section-title">各选项累计名次分</Text>
             <Text className="tiny muted">每题按名次换算成分值（选项数 → 1），逐题累加</Text>
@@ -202,7 +238,7 @@ export default function Report() {
           </View>
         )}
 
-        <View className="report-card">
+        {!locked && <View className="report-card">
           <Text className="report-section-title">作答回顾</Text>
           <Text className="tiny muted">按各题的作答交互还原你的选择</Text>
           {scale.questions.map((question, index) => {
@@ -219,7 +255,36 @@ export default function Report() {
               </View>
             );
           })}
-        </View>
+        </View>}
+
+        {!locked && isMbti && typeInfo && (
+          <View className="report-card">
+            <Text className="report-section-title">类型解读</Text>
+            <Text className="report-type-desc">{typeInfo.desc}</Text>
+            <Text className="report-section-subtitle">典型特质</Text>
+            {typeInfo.traits.map((item) => (
+              <View className="report-bullet" key={item}><Text>{item}</Text></View>
+            ))}
+            <Text className="report-section-subtitle">可能适合的方向</Text>
+            {typeInfo.careers.map((item) => (
+              <View className="report-bullet" key={item}><Text>{item}</Text></View>
+            ))}
+          </View>
+        )}
+
+        {locked && (
+          <View className="report-locked" onClick={() => setSheetVisible(true)}>
+            <Icon name="psychology" className="report-locked-icon" />
+            <Text className="report-locked-title">详细报告尚未解锁</Text>
+            <Text className="report-locked-desc">
+              解锁后可查看四维倾向分布、类型解读、典型特质、适合方向与全部作答回顾
+            </Text>
+            <View className="report-locked-action">
+              <Text>{pointsCostOf(scale)} 积分解锁 · 永久查看</Text>
+              <Icon name="chevronRight" className="report-locked-chevron" />
+            </View>
+          </View>
+        )}
 
         <View className="phq-disclaimer">
           <Text>重要提示</Text>
@@ -241,6 +306,27 @@ export default function Report() {
           保存结果
         </Button>
       </View>
+
+      <UnlockSheet
+        visible={sheetVisible}
+        scale={scale}
+        balance={balance}
+        onClose={() => setSheetVisible(false)}
+        onConfirm={() => {
+          const result = unlockReport(scale);
+          setSheetVisible(false);
+          if (result === 'unlocked' || result === 'already' || result === 'free') {
+            refreshPurchase();
+            Taro.showToast({ title: '已解锁，可永久查看', icon: 'none' });
+          } else {
+            Taro.showToast({ title: '积分不足', icon: 'none' });
+          }
+        }}
+        onRecharge={() => {
+          setSheetVisible(false);
+          Taro.showToast({ title: '充值功能待接入', icon: 'none' });
+        }}
+      />
     </View>
   );
 }

@@ -32,7 +32,9 @@ const coverFiles: Record<string, string> = {
   // 雨中荷塘的静坐，对应焦虑的安抚
   gad: 'seloramedataimg-9.webp',
   // 花田中的活力人群，对应人格类型
-  mbti: 'seloramedataimg-mbti-10.webp',
+  'mbti-32': 'seloramedataimg-mbti-10.webp',
+  'mbti-93': 'seloramedataimg-mbti-10.webp',
+  'mbti-100': 'seloramedataimg-mbti-11.webp',
   // 四人俯视图，对应四型人格模型
   disc: 'seloramedataimg-mbti-11.webp',
 }

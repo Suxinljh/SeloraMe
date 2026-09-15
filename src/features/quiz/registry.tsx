@@ -5,6 +5,7 @@ import SingleChoice from './interactions/SingleChoice'
 import MultiChoice from './interactions/MultiChoice'
 import Ranking from './interactions/Ranking'
 import Matching from './interactions/Matching'
+import ScaleChoice from './interactions/ScaleChoice'
 
 /**
  * 作答交互组件注册表。
@@ -24,4 +25,5 @@ export const INTERACTION_COMPONENTS: Record<QuizInteractionKind, ComponentType<I
   multiple: MultiChoice,
   rank: Ranking,
   match: Matching,
+  scale: ScaleChoice,
 }

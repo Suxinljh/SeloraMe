@@ -2946,6 +2946,272 @@ image {
     text-align: center;
 }
 
+/* ══════════════════════════════════════════════
+   双向刻度交互（两端描述 + N 点）
+   ══════════════════════════════════════════════ */
+.quiz-scale {
+    display: block;
+    padding: 8px 0 0;
+}
+.quiz-scale-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    margin: 0 8px 20px;
+}
+.quiz-scale-label {
+    flex: 1;
+    color: $muted;
+    font-size: 22px;
+    line-height: 32px;
+}
+.quiz-scale-label.is-right {
+    text-align: right;
+}
+.quiz-scale-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+.quiz-scale-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    margin: 0;
+    padding: 0;
+    border: 2px solid #d7d2e0;
+    border-radius: 50%;
+    background: #fff;
+    color: $muted;
+    font-size: 26px;
+    font-weight: 600;
+}
+.quiz-scale-btn::after {
+    border: 0;
+}
+.quiz-scale-btn.size-md {
+    width: 76px;
+    height: 76px;
+}
+.quiz-scale-btn.size-sm {
+    width: 64px;
+    height: 64px;
+}
+.quiz-scale-btn.is-selected {
+    border-color: transparent;
+    background: $purple;
+    color: #fff;
+}
+
+/* ══════════════════════════════════════════════
+   解锁详细报告的半屏弹层
+   ══════════════════════════════════════════════ */
+.unlock-mask {
+    position: fixed;
+    z-index: 200;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(24, 20, 32, 0.45);
+}
+.unlock-sheet {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 20px 32px calc(40px + env(safe-area-inset-bottom));
+    border-radius: 40px 40px 0 0;
+    background: #fff;
+}
+.unlock-handle {
+    width: 72px;
+    height: 8px;
+    margin: 0 auto 28px;
+    border-radius: 4px;
+    background: #e2dde9;
+}
+.unlock-title {
+    display: block;
+    color: #1c1b1f;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 44px;
+}
+.unlock-rate {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 20px 24px;
+    border-radius: 24px;
+    background: #f1ecfd;
+}
+.unlock-rate text {
+    color: #484554;
+    font-size: 22px;
+    line-height: 32px;
+}
+.unlock-rate-icon {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    filter: invert(27%) sepia(70%) saturate(2188%) hue-rotate(232deg)
+        brightness(85%) contrast(89%);
+}
+.unlock-rows {
+    margin-top: 24px;
+}
+.unlock-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 16px 0;
+}
+.unlock-row text:first-child {
+    color: $muted;
+    font-size: 24px;
+}
+.unlock-cost {
+    color: #1c1b1f;
+    font-size: 30px;
+    font-weight: 600;
+}
+.unlock-balance {
+    color: #106d20;
+    font-size: 30px;
+    font-weight: 600;
+}
+.unlock-balance.is-low {
+    color: #a32d2d;
+}
+.unlock-perks {
+    margin-top: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #f0edf2;
+}
+.unlock-perk {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+}
+.unlock-perk text {
+    flex: 1;
+    color: #484554;
+    font-size: 22px;
+    line-height: 32px;
+}
+.unlock-perk-icon {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    margin-top: 2px;
+    filter: invert(31%) sepia(59%) saturate(953%) hue-rotate(79deg)
+        brightness(91%) contrast(93%);
+}
+.unlock-confirm {
+    margin-top: 28px;
+    border: 0;
+    border-radius: 999px;
+    background: $purple;
+    color: #fff;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 88px;
+}
+.unlock-confirm.is-disabled {
+    background: #1c1b1f;
+}
+.unlock-cancel {
+    margin-top: 12px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: $muted;
+    font-size: 26px;
+}
+.unlock-confirm::after,
+.unlock-cancel::after {
+    border: 0;
+}
+
+/* ══════════════════════════════════════════════
+   报告页：类型解读与未解锁占位
+   ══════════════════════════════════════════════ */
+.report-type-desc {
+    display: block;
+    margin-bottom: 20px;
+    color: #34495e;
+    font-size: 24px;
+    line-height: 38px;
+}
+.report-section-subtitle {
+    display: block;
+    margin: 16px 0 8px;
+    color: #484554;
+    font-size: 24px;
+    font-weight: 600;
+}
+.report-bullet {
+    padding: 8px 0 8px 24px;
+    border-bottom: 1px solid #f5f2f7;
+}
+.report-bullet text {
+    color: #484554;
+    font-size: 24px;
+    line-height: 34px;
+}
+.report-locked {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 24px;
+    padding: 48px 32px;
+    border-radius: 32px;
+    background: #fff;
+}
+.report-locked-icon {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 20px;
+    filter: invert(51%) sepia(11%) saturate(552%) hue-rotate(212deg)
+        brightness(89%) contrast(86%);
+    opacity: 0.7;
+}
+.report-locked-title {
+    color: #1c1b1f;
+    font-size: 28px;
+    font-weight: 600;
+}
+.report-locked-desc {
+    margin-top: 12px;
+    color: $muted;
+    font-size: 22px;
+    line-height: 34px;
+    text-align: center;
+}
+.report-locked-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+    padding: 20px 40px;
+    border-radius: 999px;
+    background: $purple;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 600;
+}
+.report-locked-chevron {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0) invert(1);
+}
+
 /* 报告页：字母型量表（MBTI / DISC）的类型代码 */
 .report-type {
     display: block;

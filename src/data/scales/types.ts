@@ -46,7 +46,7 @@ export const SCALE_CATEGORIES: Array<{ key: ScaleCategory; name: string }> = [
  * 3. src/features/quiz/registry.tsx 内的组件表加一条 Record 记录
  * 答题页本身不需要改动。
  */
-export type QuizInteractionKind = 'single' | 'multiple' | 'rank' | 'match'
+export type QuizInteractionKind = 'single' | 'multiple' | 'rank' | 'match' | 'scale'
 
 export type QuizInteraction =
   /** 单选 */
@@ -57,6 +57,11 @@ export type QuizInteraction =
   | { kind: 'rank' }
   /** 配对：题目的 options 为左列，targets 为右列，需一一配对 */
   | { kind: 'match'; targets: string[] }
+  /**
+   * 双向刻度：题干给出两端描述，用户在 points 个刻度上选一点（默认 5 点）。
+   * 选项按下标从 low 端排到 high 端，故选项数应等于 points。
+   */
+  | { kind: 'scale'; points?: number }
 
 /**
  * 单题作答值。按交互类型取不同形态：
@@ -119,6 +124,17 @@ export type ScaleQuestion = {
    * 渲染与校验由 src/features/quiz 按 kind 分发，本字段只声明类型。
    */
   interaction?: QuizInteraction
+  /**
+   * 双向刻度题的两端描述。仅 interaction.kind === 'scale' 时使用，
+   * 例如 { low: '独处或与少数熟人相处', high: '主动结识很多新朋友' }。
+   */
+  endpoints?: { low: string; high: string }
+  /**
+   * 双向题的两极字母，选项按下标从 low 端排到 high 端。
+   * 用于按极累计得分：选项下标 i 给 low 记 (n-1-i) 分、给 high 记 i 分。
+   * A/B 二选一题型同样适用 —— n=2 时等价于给所选那一极记 1 分。
+   */
+  poles?: { low: string; high: string }
 }
 
 /** 计分方式 */

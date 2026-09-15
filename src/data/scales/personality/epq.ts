@@ -13,6 +13,7 @@ const scale: Scale = {
   duration: '约 15 分钟',
   tag: '专业量表',
   participants: '持续更新中',
+  price: '¥9.9',
   intro: [
     '艾森克人格问卷（Eysenck Personality Questionnaire，EPQ）由英国伦敦大学心理系和精神病研究所的艾森克教授编制。',
     '艾森克通过因素分析归纳出三个互相正交的维度：内外向性 E、神经质（情绪性）N、精神质（倔强、讲求实际）P，并设 L 量表测定掩饰、假托或自身隐蔽。',
