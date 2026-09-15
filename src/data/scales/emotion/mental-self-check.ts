@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 5 分钟',
   tag: '自我筛查',
-  participants: '持续更新中',
+  participantCount: 7,
   intro: [
     '本表帮助你了解自己的心理健康程度，共 20 题，覆盖情绪、强迫、人际敏感等方面。',
     '请根据实际情况，在“是 / 无法确定 / 不是”中选择最接近自己的选项。',

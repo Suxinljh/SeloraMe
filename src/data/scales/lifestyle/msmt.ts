@@ -10,7 +10,7 @@ const scale: Scale = {
   category: 'lifestyle',
   duration: '约 5 分钟',
   tag: '学习动机',
-  participants: '持续更新中',
+  participantCount: 26,
   price: '¥5.9',
   intro: [
     '本量表用于了解中学生在学习动机、学习兴趣、学习目标制定上是否存在行为困扰。',

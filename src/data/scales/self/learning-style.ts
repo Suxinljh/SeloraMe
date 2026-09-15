@@ -41,7 +41,7 @@ const scale: Scale = {
   category: 'self',
   duration: '约 8 分钟',
   tag: '自我觉察',
-  participants: '持续更新中',
+  participantCount: 2537,
   price: '¥5.9',
   intro: [
     '本问卷旨在了解个人在学习过程中的学习偏好，即达成有效学习的习惯性反应倾向，涵盖学习方式、思维活动方式与处理日常情景的方式。',

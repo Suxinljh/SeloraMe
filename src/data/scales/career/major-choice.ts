@@ -10,7 +10,7 @@ const scale: Scale = {
   category: 'career',
   duration: '约 10 分钟',
   tag: '志愿填报',
-  participants: '持续更新中',
+  participantCount: 60678,
   price: '¥19.9',
   intro: [
     '本测试以霍兰德（Holland）人格-职业类型匹配理论为基础，结合考生心理状态与高校专业特征编制，用于高考志愿填报时判断最适合就读的专业方向。',

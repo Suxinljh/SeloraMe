@@ -15,7 +15,7 @@ const scale: Scale = {
   category: 'romance',
   duration: '约 6 分钟',
   tag: '依恋类型',
-  participants: '持续更新中',
+  participantCount: 70247,
   price: '¥9.9',
   intro: [
     '本测评测量成人恋爱中的依恋类型，包含「恋爱依恋回避」与「恋爱依恋焦虑」两个维度，各 15 题，共 30 题。',

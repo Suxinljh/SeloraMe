@@ -13,7 +13,7 @@ const scale: Scale = {
   category: 'lifestyle',
   duration: '约 8 分钟',
   tag: '权威量表',
-  participants: '持续更新中',
+  participantCount: 29,
   price: '¥5.9',
   intro: [
     '《青少年时间管理倾向量表》（ATMD）由黄希庭、张志杰等人编制，用于评估青少年的时间管理倾向。',

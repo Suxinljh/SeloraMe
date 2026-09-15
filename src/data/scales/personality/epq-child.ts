@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 15 分钟',
   tag: '专业量表',
-  participants: '持续更新中',
+  participantCount: 4458,
   price: '¥9.9',
   intro: [
     '艾森克儿童个性问卷（Eysenck Personality Questionnaire，儿童形式）是艾森克人格问卷的儿童版本。',

@@ -13,7 +13,7 @@ const scale: Scale = {
   category: 'lifestyle',
   duration: '约 12 分钟',
   tag: '专业量表',
-  participants: '持续更新中',
+  participantCount: 7,
   price: '¥9.9',
   intro: [
     '中国中学生心理健康量表（MMHI-60）由王极盛编制，适用于中学生心理健康状况筛查。',

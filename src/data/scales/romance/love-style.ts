@@ -10,7 +10,7 @@ const scale: Scale = {
   category: 'romance',
   duration: '约 8 分钟',
   tag: '恋爱态度',
-  participants: '持续更新中',
+  participantCount: 1807,
   price: '¥9.9',
   intro: [
     '本量表描述恋爱中的感受，依据真实感受与经验作答：有伴侣者以现状作答，曾有伴侣者以最近一位作答，从未有伴侣者以想象方式作答。',

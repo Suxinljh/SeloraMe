@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 6 分钟',
   tag: '心理自评',
-  participants: '持续更新中',
+  participantCount: 4538,
   price: '¥9.9',
   intro: [
     '考试对学生是一种紧张刺激，易引起焦虑，产生一定的心理压力，这属于正常现象。但过度的焦虑不仅会危害认知过程，不能正常发挥应有的水平，而且会损害身心健康。',

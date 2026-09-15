@@ -11,7 +11,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 6 分钟',
   tag: '快速版',
-  participants: '持续更新中',
+  participantCount: 748002,
   intro: [
     '这是 16 型人格倾向测评的快速版本，共 32 道题，约 6 分钟完成。',
     '每道题给出两种相反的描述，中间有五个刻度。请选择更贴近你平时真实状态的位置，越靠一端表示越偏向那一侧，中间表示两者相当。',

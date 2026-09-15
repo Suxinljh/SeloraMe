@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'career',
   duration: '约 6 分钟',
   tag: '逆商 AQ',
-  participants: '持续更新中',
+  participantCount: 897,
   price: '¥9.9',
   intro: [
     'AQ（逆境商数）反映个体面对逆境时的处理能力，描绘一个人挫折忍耐力的高低。AQ 越高，越能以弹性面对逆境、积极乐观、发挥创意寻找解决方案。',

@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 15 分钟',
   tag: '专业量表',
-  participants: '持续更新中',
+  participantCount: 2765,
   price: '¥9.9',
   intro: [
     '艾森克人格问卷（Eysenck Personality Questionnaire，EPQ）由英国伦敦大学心理系和精神病研究所的艾森克教授编制。',

@@ -17,7 +17,7 @@ const scale: Scale = {
   category: 'self',
   duration: '约 12 分钟',
   tag: '国家标准',
-  participants: '持续更新中',
+  participantCount: 848,
   price: '¥9.9',
   intro: [
     '《中医体质分类与判定》标准由中华中医药学会编制，将体质分为平和质、气虚质、阳虚质、阴虚质、痰湿质、湿热质、血瘀质、气郁质、特禀质九种类型。',

@@ -11,7 +11,7 @@ const scale: Scale = {
   category: 'career',
   duration: '约 20 分钟',
   tag: '职业兴趣',
-  participants: '持续更新中',
+  participantCount: 54781,
   price: '¥19.9',
   intro: [
     '本量表基于霍兰德（Holland）人格-职业类型匹配理论，将人格分为六种类型：现实型(R)、研究型(I)、艺术型(A)、社会型(S)、企业型(E)、常规型(C)。',

@@ -11,7 +11,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 12 分钟',
   tag: '专业量表',
-  participants: '持续更新中',
+  participantCount: 3,
   price: '¥5.9',
   intro: [
     '《青少年气质量表》编制于 1980 年，气质概念源于巴甫洛夫的高级神经活动类型学说。',

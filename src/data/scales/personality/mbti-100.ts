@@ -10,7 +10,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 20 分钟',
   tag: '专业版',
-  participants: '持续更新中',
+  participantCount: 35398,
   price: '¥9.9',
   intro: [
     '这是 16 型人格倾向测评的专业版，共 100 道题，约 20 分钟完成。',

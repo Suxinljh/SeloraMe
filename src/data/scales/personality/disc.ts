@@ -30,7 +30,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 10 分钟',
   tag: '经典量表',
-  participants: '持续更新中',
+  participantCount: 269791,
   price: '¥9.9',
   intro: [
     'DISC 理论由美国心理学家威廉·莫尔顿·马斯顿于 20 世纪 20 年代创建，用以解释正常人的情绪反应。',

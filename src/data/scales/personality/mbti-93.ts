@@ -44,7 +44,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 18 分钟',
   tag: '完整版',
-  participants: '持续更新中',
+  participantCount: 385110,
   price: '¥5.9',
   intro: [
     'MBTI（迈尔斯-布里格斯类型指标）是一份性格自测问卷，由美国的凯瑟琳·库克·布里格斯和伊莎贝尔·布里格斯·迈尔斯根据荣格的心理类型理论编制而成。',

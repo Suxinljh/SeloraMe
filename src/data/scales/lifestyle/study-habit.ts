@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'lifestyle',
   duration: '约 4 分钟',
   tag: '学习测评',
-  participants: '持续更新中',
+  participantCount: 4,
   price: '¥5.9',
   intro: [
     '本测试共 16 题，用于了解初中生当前的学习习惯状况。',

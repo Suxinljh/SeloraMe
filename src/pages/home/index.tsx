@@ -3,7 +3,7 @@ import Taro, { useDidShow } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
 import searchIcon from "../../assets/figma/home-search.svg";
-import { getScale, SCALE_CATEGORIES, type Scale } from "../../data/scales";
+import { formatParticipants, getScale, SCALE_CATEGORIES, type Scale } from "../../data/scales";
 import { coverFor } from "../../data/covers";
 import { setActiveTab } from "../../utils/custom-tabbar";
 
@@ -137,7 +137,7 @@ export default function Home() {
                     <Icon name="schedule" className="meta-icon" />
                     {scale.duration}
                   </Text>
-                  <Text className='green'>{scale.participants}</Text>
+                  <Text className='green'>{formatParticipants(scale.participantCount)}</Text>
                 </View>
               </View>
             );

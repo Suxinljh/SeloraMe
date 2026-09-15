@@ -15,7 +15,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 8 分钟',
   tag: '心理自评',
-  participants: '持续更新中',
+  participantCount: 42196,
   price: '¥5.9',
   intro: [
     '情商量表（Schutte 情绪智商量表）用于评估个体在情绪感知、情绪管理、他人情绪理解及情绪运用与表达方面的能力。',

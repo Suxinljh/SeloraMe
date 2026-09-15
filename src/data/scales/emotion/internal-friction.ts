@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 10 分钟',
   tag: '心理自评',
-  participants: '持续更新中',
+  participantCount: 25542,
   price: '¥5.9',
   intro: [
     '内耗量表用于评估个体在情绪、认知与自我感受层面的心理内耗程度。',

@@ -178,11 +178,12 @@ export type Scale = {
   /** 卡片右上角标签，如「医学标准」「高信效度」 */
   tag: string
   /**
-   * 测评人数文案。
-   * 当前无真实后端数据，全部统一为「持续更新中」，且**不在界面上作为人数展示**。
-   * 接入统计接口后可直接启用；在此之前不要填编造的数字。
+   * 已测人数。展示时经 formatParticipants 分档处理，不直接暴露精确数字。
+   *
+   * 当前为占位数据（按 9 倍递增的等比数列铺开，覆盖各展示档位）。
+   * 接入真实统计后，把真实人数写入本字段即可，展示格式无需改动。
    */
-  participants: string
+  participantCount: number
   /**
    * 价格文案，如「¥19.9」。**省略即表示免费**。
    *
@@ -279,5 +280,30 @@ export const isFreeScale = (scale: Scale): boolean => !scale.price
 
 /** 卡片上展示的价格文案 */
 export const priceLabelOf = (scale: Scale): string => scale.price ?? '免费'
+
+/**
+ * 已测人数的展示文案。
+ *
+ * 分档规则：
+ *   不足 10 人  → 按实际值展示（如 6+人测过）
+ *   10～98      → 10+人测过
+ *   99～999     → 99+人测过
+ *   1000～9999  → 1k+人测过
+ *   1 万～10 万以下 → 10k+人测过
+ *   10 万以上   → 10w+人测过
+ *
+ * 分档而非直接显示精确值，是为了在人数很少时不暴露「只有 3 个人测过」这类
+ * 影响可信度的信息，人数很多时也不必维护精确统计。
+ * 未来接入真实统计后，把真实人数写入 participantCount 即可，展示自动跟随。
+ */
+export const formatParticipants = (count: number): string => {
+  if (!Number.isFinite(count) || count <= 0) return '敬请期待'
+  if (count < 10) return `${Math.floor(count)}+人测过`
+  if (count < 99) return '10+人测过'
+  if (count < 1000) return '99+人测过'
+  if (count < 10000) return '1k+人测过'
+  if (count < 100000) return '10k+人测过'
+  return '10w+人测过'
+}
 
 

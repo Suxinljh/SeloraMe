@@ -1,6 +1,6 @@
 import { Text, View } from '@tarojs/components'
 import Icon from './Icon'
-import { matchRange, type Scale } from '../data/scales'
+import { formatParticipants, matchRange, type Scale } from '../data/scales'
 
 /**
  * 量表卡片。分类列表页与搜索结果页共用，保证两处展示完全一致。
@@ -35,7 +35,7 @@ export default function ScaleCard ({ scale, keyword = '', onClick }: { scale: Sc
       </View>
       <View className='assessment-bottom'>
         <Text className='tag'>{scale.tag}</Text>
-        <Text className='green'>{scale.participants}</Text>
+        <Text className='green'>{formatParticipants(scale.participantCount)}</Text>
       </View>
     </View>
   )

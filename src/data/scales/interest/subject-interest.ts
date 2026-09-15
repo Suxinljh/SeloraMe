@@ -11,7 +11,7 @@ const scale: Scale = {
   category: 'interest',
   duration: '约 15 分钟',
   tag: '兴趣测评',
-  participants: '持续更新中',
+  participantCount: 526,
   price: '¥9.9',
   intro: [
     '本测评共 108 题，每题 5 个备选答案，请根据自身实际情况每题只选一个答案。',

@@ -11,7 +11,7 @@ const scale: Scale = {
   category: 'career',
   duration: '约 12 分钟',
   tag: '能力测评',
-  participants: '持续更新中',
+  participantCount: 623,
   price: '¥9.9',
   intro: [
     '本测试从一般学习、语言、算术、空间判断、形态知觉、文秘、眼手协调、手指灵巧、手的灵巧九个方面评估个体的职业能力倾向。',

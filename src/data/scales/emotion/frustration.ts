@@ -56,7 +56,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 4 分钟',
   tag: '自我评估',
-  participants: '持续更新中',
+  participantCount: 6,
   price: '¥5.9',
   intro: [
     '本测试用于了解个体面对挫折时的应对方式与抗挫折能力。',
