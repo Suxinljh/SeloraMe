@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 10 分钟',
   tag: '心理自评',
-  participants: '心理内耗测评',
+  participants: '持续更新中',
   intro: [
     '内耗量表用于评估个体在情绪、认知与自我感受层面的心理内耗程度。',
     '量表包含五个维度：恐惧与怯懦、被动反刍、目标失当、内生动力、自我感受链接与回应，各 10 题，共 50 题。',

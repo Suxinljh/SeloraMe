@@ -55,7 +55,7 @@ export default function AssessmentDetail () {
         <Text className='assessment-detail-title'>{scale.title}</Text>
         <Text className='assessment-detail-description'>{scale.desc}</Text>
         <View className='assessment-detail-metrics'>
-          <View><Text className='assessment-detail-metric-value'>{scale.participants}</Text><Text>测评人数</Text></View>
+          <View><Text className='assessment-detail-metric-value'>{scale.duration}</Text><Text>预计用时</Text></View>
           <View><Text className='assessment-detail-metric-value'>{scale.questions.length} 题</Text><Text>题目数量</Text></View>
           <View><Text className='assessment-detail-metric-value'>{categoryNames[scale.category]}</Text><Text>所属分类</Text></View>
         </View>

@@ -3,142 +3,147 @@ import Taro, { useDidShow } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
 import searchIcon from "../../assets/figma/home-search.svg";
-import heroImage from "../../assets/figma/home-hero.svg";
-import mbtiImage from "../../assets/figma/home-mbti.png";
-import moodImage from "../../assets/figma/home-mood.png";
-import relationshipImage from "../../assets/figma/home-relationship.png";
-import workImage from "../../assets/figma/home-work.png";
+import { getScale, SCALE_CATEGORIES, type Scale } from "../../data/scales";
+import { coverFor } from "../../data/covers";
 import { setActiveTab } from "../../utils/custom-tabbar";
 
-const cards: Array<[string, string, string, string, string, string, string]> = [
-  [
-    "专业",
-    "mbti",
-    "MBTI 人格全解析",
-    "深度了解你的性格偏好与处事模式",
-    "18分钟",
-    "免费",
-    mbtiImage,
-  ],
-  [
-    "热门",
-    "internal-friction",
-    "情绪内耗自测评估",
-    "识别反刍思维与精神内耗模式",
-    "8分钟",
-    "免费",
-    moodImage,
-  ],
-  [
-    "深度",
-    "attachment",
-    "成人恋爱依恋类型",
-    "探索你在亲密互动中的安全感与期待",
-    "12分钟",
-    "免费",
-    relationshipImage,
-  ],
-  [
-    "轻松",
-    "aq",
-    "国际标准逆商测试",
-    "看看你面对挫折与职场压力时的复原力",
-    "10分钟",
-    "免费",
-    workImage,
-  ],
+const categoryNames = SCALE_CATEGORIES.reduce<Record<string, string>>((acc, { key, name }) => {
+  acc[key] = name;
+  return acc;
+}, {});
+
+/** 首页主推量表。其余推荐位在下方 featuredIds 中列出 */
+const heroScaleId = "internal-friction";
+
+/** 推荐测评栏目展示的量表，按展示顺序排列 */
+const featuredIds = [
+  "mbti",
+  "attachment",
+  "major-choice",
+  "phq-9",
+  "gad",
+  "college-mental",
+  "study-habit",
+  "learning-style",
 ];
+
+/** 分类快捷入口 */
+const categoryEntries: Array<[string, string]> = [
+  ["情绪心理", "emotion"],
+  ["性格人格", "personality"],
+  ["专业量表", "professional"],
+  ["恋爱关系", "romance"],
+  ["职场能力", "career"],
+  ["生活状态", "lifestyle"],
+];
+
+/** 推荐位标签。按顺序循环取用，与 styles/index.scss 中的 badge-N 对应 */
+const badges = ["专业", "热门", "深度", "轻松"];
 
 export default function Home() {
   const goDetail = (scaleId: string) =>
     Taro.navigateTo({ url: `/pages/assessment-detail/index?assessment=${scaleId}` });
-  const go = () => goDetail("phq-9");
+  const goCategory = (category: string) =>
+    Taro.navigateTo({ url: `/pages/assessment-list/index?category=${category}` });
+
   useDidShow(() => setActiveTab(0));
+
+  const hero: Scale | undefined = getScale(heroScaleId);
+  const heroCover = hero ? coverFor(hero.id) : undefined;
+  const featured = featuredIds.flatMap((id) => {
+    const scale = getScale(id);
+    return scale ? [scale] : [];
+  });
+
   return (
     <View className="page home-page">
       <Nav light />
       <View className="content">
         <View className="search home-search">
           <Image src={searchIcon} className="search-icon" />
-          <Text>搜索测评，如 MBTI、依恋模式、焦虑指数...</Text>
+          <Text>搜索测评，如 MBTI、霍兰德、焦虑指数...</Text>
         </View>
-        <View className="hero">
-          <View className="hero-decor decor-purple" />
-          <View className="hero-decor decor-green" />
-          <Image className="hero-illustration" src={heroImage} />
-          <View className="hero-top">
-            <Text>
-              <Icon name="autoAwesome" className="label-icon" />
-              今日特别推荐
-            </Text>
-            <Text>约15分钟</Text>
-          </View>
-          <View className="hero-copy">
-            <Text className="hero-title">
-              探索内心的\n<Text>温和回响</Text>
-            </Text>
-            <Text className="hero-desc">
-              15分钟，带你厘清近期潜意识与真实情绪图谱，找回内在节奏。
-            </Text>
-          </View>
-          <View className="hero-footer">
-            <Button className="start" onClick={go}>
-              开始探索　
-              <Icon name="arrowForward" className="button-icon" />
-            </Button>
-            <View className="complete">
-              <Text>9k+</Text>
-              <Text>人已完成</Text>
+
+        {hero && (
+          <View className="hero">
+            <View className="hero-decor decor-purple" />
+            <View className="hero-decor decor-green" />
+            {heroCover && <Image className="hero-cover" src={heroCover} mode="aspectFill" />}
+            <View className="hero-top">
+              <Text>
+                <Icon name="autoAwesome" className="label-icon" />
+                今日特别推荐
+              </Text>
+              <Text>{hero.duration}</Text>
+            </View>
+            <View className="hero-copy">
+              <Text className="hero-title">{hero.title}</Text>
+              <Text className="hero-desc">{hero.desc}</Text>
+            </View>
+            <View className="hero-footer">
+              <Button className="start" onClick={() => goDetail(hero.id)}>
+                开始探索　
+                <Icon name="arrowForward" className="button-icon" />
+              </Button>
+              <View className="complete">
+                <Text>{hero.questions.length} 题</Text>
+                <Text>{categoryNames[hero.category]}</Text>
+              </View>
             </View>
           </View>
-        </View>
+        )}
+
         <ScrollView scrollX className="home-tabs-scroll">
           <View className="home-tabs">
-            {["情绪", "性格", "关系", "职场", "爱情", "自我探索"].map(
-              (x, i) => (
-                <Text
-                  key={x}
-                  className={`home-chip ${i === 0 ? "selected" : ""}`}
-                >
-                  {i === 0 ? "●　" : ""}
-                  {x}
-                </Text>
-              ),
-            )}
+            {categoryEntries.map(([label, category], i) => (
+              <Text
+                key={category}
+                className={`home-chip ${i === 0 ? "selected" : ""}`}
+                onClick={() => goCategory(category)}
+              >
+                {i === 0 ? "●　" : ""}
+                {label}
+              </Text>
+            ))}
           </View>
         </ScrollView>
+
         <View className="section-head">
           <Text className="section-title">推荐测评</Text>
-          <Text
-            className="purple tiny"
-            onClick={() =>
-              Taro.navigateTo({ url: "/pages/assessment-list/index" })
-            }
-          >
+          <Text className="purple tiny" onClick={() => Taro.navigateTo({ url: "/pages/assessment-list/index" })}>
             查看全部
           </Text>
         </View>
+
         <View className="assessment-grid">
-          {cards.map(([badge, scaleId, title, desc, duration, price, image], i) => (
-            <View key={title} className="feature-card" onClick={() => goDetail(scaleId)}>
-              <View className="art">
-                <Image src={image as string} mode="aspectFill" />
-                <Text className={`art-badge badge-${i}`}>{badge}</Text>
+          {featured.map((scale, i) => {
+            const cover = coverFor(scale.id);
+            return (
+              <View key={scale.id} className="feature-card" onClick={() => goDetail(scale.id)}>
+                <View className="art">
+                  {cover ? (
+                    <Image src={cover} mode="aspectFill" />
+                  ) : (
+                    <View className="art-fallback">
+                      <Icon name="psychology" className="art-fallback-icon" />
+                    </View>
+                  )}
+                  <Text className={`art-badge badge-${i % badges.length}`}>{badges[i % badges.length]}</Text>
+                </View>
+                <Text className="feature-title">{scale.title}</Text>
+                <Text className="feature-desc">{scale.desc}</Text>
+                <View className="feature-meta">
+                  <Text>
+                    <Icon name="schedule" className="meta-icon" />
+                    {scale.duration}
+                  </Text>
+                  <Text className="green">{scale.questions.length} 题</Text>
+                </View>
               </View>
-              <Text className="feature-title">{title}</Text>
-              <Text className="feature-desc">{desc}</Text>
-              <View className="feature-meta">
-                <Text>
-                  <Icon name="schedule" className="meta-icon" />
-                  {duration}
-                </Text>
-                <Text className={price === "免费" ? "green" : "price"}>
-                  {price}
-                </Text>
-              </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
+
         <View className="quote">
           <Text className="quote-mark">“</Text>
           <View>

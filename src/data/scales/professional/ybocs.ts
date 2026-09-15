@@ -14,7 +14,7 @@ const scale: Scale = {
   category: 'professional',
   duration: '约 10 分钟',
   tag: '专业量表',
-  participants: '强迫症状筛查',
+  participants: '持续更新中',
   intro: [
     '耶鲁布朗强迫症严重程度量表（Yale-Brown Obsessive Compulsive Scale, Y-BOCS）在国内外研究和实践中普遍使用，其结果具有权威性的参考意义。',
     '量表分为强迫思维与强迫行为两个部分，各 5 题，每题按 0-4 五级评分，两部分分别求和并合计总分。',

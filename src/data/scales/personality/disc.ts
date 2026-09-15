@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'personality',
   duration: '约 10 分钟',
   tag: '经典量表',
-  participants: '超过 100 万人测过',
+  participants: '持续更新中',
   intro: [
     'DISC 理论由美国心理学家威廉·莫尔顿·马斯顿于 20 世纪 20 年代创建，用以解释正常人的情绪反应。',
     '马斯顿采用四个典型的人格特质因子：Dominance 支配、Influence 影响、Steady 稳健、Compliance 服从，DISC 即这四个英文单词的首字母。',

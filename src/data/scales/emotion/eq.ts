@@ -15,7 +15,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 8 分钟',
   tag: '心理自评',
-  participants: '情绪智力测评',
+  participants: '持续更新中',
   intro: [
     '情商量表（Schutte 情绪智商量表）用于评估个体在情绪感知、情绪管理、他人情绪理解及情绪运用与表达方面的能力。',
     '量表共 33 题，采用「非常不符合」到「非常符合」五级作答，总分为各题得分之和（满分 165 分）。',

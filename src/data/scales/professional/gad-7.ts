@@ -12,7 +12,7 @@ const scale: Scale = {
   category: 'professional',
   duration: '约 2 分钟',
   tag: '高信效度',
-  participants: '9.6 万人已测',
+  participants: '持续更新中',
   intro: [
     '焦虑，并不只是「想太多」。',
     '当压力持续存在时，我们可能会出现紧张、担忧、难以放松、坐立不安，甚至总觉得有什么不好的事情即将发生。',

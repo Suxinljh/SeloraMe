@@ -11,7 +11,7 @@ const scale: Scale = {
   category: 'interest',
   duration: '约 15 分钟',
   tag: '兴趣测评',
-  participants: '已有数万人参与',
+  participants: '持续更新中',
   intro: [
     '本测评共 108 题，每题 5 个备选答案，请根据自身实际情况每题只选一个答案。',
     '选项计分为 A=5 分（很符合）、B=4 分（比较符合）、C=3 分（很难说）、D=2 分（较不符合）、E=1 分（很不符合）。',

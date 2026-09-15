@@ -20,7 +20,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 4 分钟',
   tag: '自我评估',
-  participants: '已有数万人参与测评',
+  participants: '持续更新中',
   intro: [
     '本测试用于了解个体面对挫折时的应对方式与抗挫折能力。',
     '共 14 题，请根据自己过去一年中的真实情况作答，凭第一印象选择即可。',

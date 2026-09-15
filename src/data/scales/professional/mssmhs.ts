@@ -11,7 +11,7 @@ const scale: Scale = {
   category: 'professional',
   duration: '约 20 分钟',
   tag: '专业量表',
-  participants: '中学生心理筛查',
+  participants: '持续更新中',
   intro: [
     '中学生心理健康量表（MSSMHS）由我国著名心理学家王极盛教授编制，可以用做评估中学生的心理健康状况。',
     '该量表有 10 个分量表，分别测查强迫症状、偏执、敌对、人际关系紧张与敏感、抑郁、焦虑、学习压力、适应不良、情绪不平衡、心理不平衡。',

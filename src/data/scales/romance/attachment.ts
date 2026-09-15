@@ -15,7 +15,7 @@ const scale: Scale = {
   category: 'romance',
   duration: '约 6 分钟',
   tag: '依恋类型',
-  participants: '已有数万人参与',
+  participants: '持续更新中',
   intro: [
     '本测评测量成人恋爱中的依恋类型，包含「恋爱依恋回避」与「恋爱依恋焦虑」两个维度，各 15 题，共 30 题。',
     '采用七点 Likert 计分：从「根本不符合」(1 分) 到「非常符合」(7 分)。每个维度 15 题求和，得分范围 15~105。',

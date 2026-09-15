@@ -15,7 +15,7 @@ const scale: Scale = {
   category: 'emotion',
   duration: '约 10 分钟',
   tag: '经典量表',
-  participants: '已有数万人参与测评',
+  participants: '持续更新中',
   intro: [
     '本表用于帮助大学生了解自身心理健康状况，共 70 题，涵盖情绪、躯体、人际等多个侧面。',
     '请根据最符合自己情况的项目快速作答，不必仔细考虑。',

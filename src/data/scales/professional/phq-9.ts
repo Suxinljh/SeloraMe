@@ -13,7 +13,7 @@ const scale: Scale = {
   category: 'professional',
   duration: '约 3 分钟',
   tag: '医学标准',
-  participants: '12.8 万人已测',
+  participants: '持续更新中',
   intro: [
     '情绪低落只是抑郁状态的一种表现。',
     '有时候，我们可能并不会觉得自己「特别难过」，但会逐渐出现对事情失去兴趣、睡眠改变、疲倦、注意力下降、食欲变化，或者越来越容易否定自己。',
