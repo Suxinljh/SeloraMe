@@ -1,9 +1,12 @@
-import { Button, Image, Text, View } from "@tarojs/components";
+import { Image, Text, View } from "@tarojs/components";
 import Taro, { useDidShow } from "@tarojs/taro";
 import Nav from "../../components/Nav";
 import Icon from "../../components/Icon";
+import SuggestBar from "../../components/SuggestBar";
 import { SCALE_CATEGORIES, categoryCounts, type ScaleCategory } from "../../data/scales";
 import { setActiveTab } from "../../utils/custom-tabbar";
+import { getCurrentUser } from "../../store/auth";
+import { ASSESSMENT_REQUEST_LINK, openSurvey } from "../../utils/tencent-survey";
 import psychologyIcon from "../../assets/icons/material/category-psychology.svg";
 import sentimentSatisfiedIcon from "../../assets/icons/material/category-sentiment-satisfied.svg";
 import favoriteIcon from "../../assets/icons/material/category-favorite.svg";
@@ -110,21 +113,14 @@ export default function Categories() {
             ))}
           </View>
         </View>
-        <View className="categories-suggest">
-          <View className="categories-suggest-icon-wrap">
-            <Icon name="helpOutline" className="categories-suggest-icon" />
-          </View>
-          <View className="categories-suggest-copy">
-            <Text className="categories-suggest-title">找不到心仪测评？</Text>
-            <Text className="categories-suggest-detail">告诉我们你的困惑，即刻为你匹配</Text>
-          </View>
-          <Button
-            className="categories-suggest-button"
-            onClick={() => Taro.showToast({ title: "建议功能即将上线", icon: "none" })}
-          >
-            提建议
-          </Button>
-        </View>
+        <SuggestBar
+          title="找不到心仪测评？"
+          detail="告诉我们你的困惑，即刻为你匹配"
+          actionText="提建议"
+          onClick={() =>
+            openSurvey(ASSESSMENT_REQUEST_LINK, getCurrentUser()?.userId)
+          }
+        />
       </View>
     </View>
   );

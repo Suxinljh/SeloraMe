@@ -8,6 +8,7 @@ import { mbtiTypeInfo } from "../../data/scales/personality/mbti-types";
 import UnlockSheet from "../../components/UnlockSheet";
 import { getSession, resetSession } from "../../store/session";
 import { getPoints, isReportUnlocked, pointsCostOf, requiresUnlock, unlockReport } from "../../store/purchase";
+import { requireLogin } from "../../utils/auth-guard";
 
 const MBTI_LETTERS = ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P']
 const DISC_LETTERS = ['D', 'I', 'S', 'C']
@@ -313,6 +314,7 @@ export default function Report() {
         balance={balance}
         onClose={() => setSheetVisible(false)}
         onConfirm={() => {
+          if (!requireLogin('解锁详细报告')) return;
           const result = unlockReport(scale);
           setSheetVisible(false);
           if (result === 'unlocked' || result === 'already' || result === 'free') {

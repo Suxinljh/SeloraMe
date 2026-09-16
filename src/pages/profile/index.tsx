@@ -1,13 +1,9 @@
-import { Button, Form, Image, Input, Text, View } from "@tarojs/components";
+import { Image, Text, View } from "@tarojs/components";
 import Taro, { useDidShow } from "@tarojs/taro";
 import { useState } from "react";
 import Nav from "../../components/Nav";
 import Icon, { type IconName } from "../../components/Icon";
-import {
-  getCurrentUser,
-  loginWithWechatProfile,
-  type SelormeUser,
-} from "../../store/auth";
+import { getCurrentUser, type SelormeUser } from "../../store/auth";
 import {
   getReportAssessments,
   getUnfinishedAssessments,
@@ -15,6 +11,7 @@ import {
 import { getProfileOverview } from "../../data/profile-overview";
 import { setActiveTab } from "../../utils/custom-tabbar";
 import { getFavoriteAssessmentIds } from "../../store/favorites";
+import { LOGIN_PAGE, requireLogin } from "../../utils/auth-guard";
 
 type ArchiveRow = [
   IconName,
@@ -32,11 +29,19 @@ const services: Array<[IconName, string, string]> = [
   ["settings", "设置与隐私", ""],
 ];
 
+/**
+ * 日常服务里需要登录的入口，值为提示语中的操作名。
+ * 不在此表中的（帮助与反馈）属静态说明，未登录也能看。
+ */
+const serviceLoginAction: Record<string, string> = {
+  我的订单: "查看已购买订单",
+  收藏的测评: "查看收藏的量表",
+  关注主题: "查看关注主题",
+  设置与隐私: "管理账号与隐私设置",
+};
+
 export default function Profile() {
   const [user, setUser] = useState<SelormeUser | null>(getCurrentUser());
-  const [nickname, setNickname] = useState("");
-  const [avatarPath, setAvatarPath] = useState("");
-  const [loggingIn, setLoggingIn] = useState(false);
   const [unfinishedCount, setUnfinishedCount] = useState(
     getUnfinishedAssessments().length,
   );
@@ -45,7 +50,6 @@ export default function Profile() {
   const [favoriteCount, setFavoriteCount] = useState(
     getFavoriteAssessmentIds().length,
   );
-  const hasNickname = nickname.trim().length > 0;
   useDidShow(() => {
     setUser(getCurrentUser());
     setUnfinishedCount(getUnfinishedAssessments().length);
@@ -55,30 +59,6 @@ export default function Profile() {
     setActiveTab(2);
   });
 
-  const chooseAvatar = (event: { detail: { avatarUrl?: string } }) =>
-    setAvatarPath(event.detail.avatarUrl || "");
-  const submitProfile = async (event: {
-    detail: { value?: Record<string, unknown> };
-  }) => {
-    const submittedNickname = event.detail.value?.nickname;
-    const nextNickname = (
-      typeof submittedNickname === "string" ? submittedNickname : nickname
-    ).trim();
-    if (!nextNickname) {
-      Taro.showToast({ title: "请填写昵称", icon: "none" });
-      return;
-    }
-    setLoggingIn(true);
-    try {
-      setUser(await loginWithWechatProfile(nextNickname, avatarPath));
-      Taro.showToast({ title: "登录成功", icon: "success" });
-    } catch (error) {
-      console.warn("SeloraMe profile login failed", error);
-      Taro.showToast({ title: "登录失败，请重试", icon: "none" });
-    } finally {
-      setLoggingIn(false);
-    }
-  };
   const rows: ArchiveRow[] = [
     [
       "quiz",
@@ -103,9 +83,9 @@ export default function Profile() {
         {
           <View
             className="profile-nav-user"
-            onClick={() =>
-              !user && Taro.showToast({ title: "请先登录", icon: "none" })
-            }
+            onClick={() => {
+              if (!user) Taro.navigateTo({ url: LOGIN_PAGE });
+            }}
           >
             {user?.avatarUrl ? (
               <Image
@@ -145,14 +125,15 @@ export default function Profile() {
           ].map(([value, label]) => (
             <View
               key={label}
-              onClick={() =>
+              onClick={() => {
+                if (!requireLogin("查看自己的心理档案")) return;
                 Taro.navigateTo({
                   url:
                     label === "已完成测评" || label === "专属报告"
                       ? "/pages/archive/index?type=reports"
                       : "/pages/topics/index",
-                })
-              }
+                });
+              }}
             >
               <Text>{value}</Text>
               <Text>{label}</Text>
@@ -165,9 +146,10 @@ export default function Profile() {
             <View
               className="archive-row"
               key={title}
-              onClick={() =>
-                Taro.navigateTo({ url: `/pages/archive/index?type=${type}` })
-              }
+              onClick={() => {
+                if (!requireLogin("查看自己的心理档案")) return;
+                Taro.navigateTo({ url: `/pages/archive/index?type=${type}` });
+              }}
             >
               <View className="archive-icon">
                 <Icon name={icon} className="row-icon" />
@@ -189,6 +171,8 @@ export default function Profile() {
               className="service"
               key={title}
               onClick={() => {
+                const loginAction = serviceLoginAction[title];
+                if (loginAction && !requireLogin(loginAction)) return;
                 if (title === "我的订单")
                   Taro.navigateTo({ url: "/pages/orders/index" });
                 if (title === "收藏的测评")

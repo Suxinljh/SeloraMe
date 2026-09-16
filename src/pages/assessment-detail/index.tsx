@@ -8,6 +8,7 @@ import {
   isFavoriteAssessment,
   toggleFavoriteAssessment,
 } from "../../store/favorites";
+import { requireLogin } from "../../utils/auth-guard";
 
 const categoryNames = SCALE_CATEGORIES.reduce<Record<string, string>>(
   (acc, { key, name }) => {
@@ -44,10 +45,13 @@ export default function AssessmentDetail() {
     );
   }
 
-  const start = () =>
+  const start = () => {
+    if (!requireLogin("开始测评并保存答题记录")) return;
     Taro.navigateTo({ url: `/pages/questions/index?assessment=${scale.id}` });
+  };
 
   const toggleFavorite = () => {
+    if (!requireLogin("收藏量表")) return;
     const nextValue = toggleFavoriteAssessment(scale.id);
     setIsFavorite(nextValue);
     Taro.showToast({

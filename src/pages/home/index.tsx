@@ -6,6 +6,7 @@ import searchIcon from "../../assets/figma/home-search.svg";
 import { formatParticipants, getScale, SCALE_CATEGORIES, type Scale } from "../../data/scales";
 import { coverFor } from "../../data/covers";
 import { setActiveTab } from "../../utils/custom-tabbar";
+import { requireLogin } from "../../utils/auth-guard";
 
 const categoryNames = SCALE_CATEGORIES.reduce<Record<string, string>>((acc, { key, name }) => {
   acc[key] = name;
@@ -59,7 +60,13 @@ export default function Home() {
     <View className="page home-page">
       <Nav light />
       <View className="content">
-        <View className="search home-search" onClick={() => Taro.navigateTo({ url: "/pages/search/index" })}>
+        <View
+          className="search home-search"
+          onClick={() => {
+            if (!requireLogin("搜索测评")) return;
+            Taro.navigateTo({ url: "/pages/search/index" });
+          }}
+        >
           <Image src={searchIcon} className="search-icon" />
           <Text>搜索测评，如 16 型人格、霍兰德、焦虑...</Text>
         </View>

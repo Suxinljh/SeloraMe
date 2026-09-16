@@ -4,8 +4,11 @@ import Taro from '@tarojs/taro'
 import Nav from '../../components/Nav'
 import Icon from '../../components/Icon'
 import ScaleCard from '../../components/ScaleCard'
+import SuggestBar from '../../components/SuggestBar'
 import searchIcon from '../../assets/figma/home-search.svg'
 import { searchScales, type Scale } from '../../data/scales'
+import { getCurrentUser } from '../../store/auth'
+import { ASSESSMENT_REQUEST_LINK, openSurvey } from '../../utils/tencent-survey'
 
 /**
  * 评测搜索页。
@@ -29,6 +32,10 @@ export default function Search () {
 
   const open = (scale: Scale) =>
     Taro.navigateTo({ url: `/pages/assessment-detail/index?assessment=${scale.id}` })
+
+  /** 搜不到时引导用户提交「求测评」需求，顺带把当前关键词和账号带给问卷 */
+  const requestAssessment = () =>
+    openSurvey(ASSESSMENT_REQUEST_LINK, getCurrentUser()?.userId)
 
   return (
     <View className='page search-page'>
@@ -69,11 +76,12 @@ export default function Search () {
           ))}
 
           {trimmed.length > 0 && results.length === 0 && (
-            <View className='search-empty'>
-              <Icon name='search' className='search-empty-icon' />
-              <Text className='search-empty-title'>没有找到「{trimmed}」相关的评测</Text>
-              <Text className='search-empty-hint'>换个词试试，或者到分类页浏览全部评测</Text>
-            </View>
+            <SuggestBar
+              title={`没找到「${trimmed}」？`}
+              detail='告诉我们你想要的测评'
+              actionText='提建议'
+              onClick={requestAssessment}
+            />
           )}
         </View>
       </View>
