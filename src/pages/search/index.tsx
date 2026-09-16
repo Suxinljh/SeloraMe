@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Input, Text, View } from '@tarojs/components'
+import { Image, Input, Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import Nav from '../../components/Nav'
 import Icon from '../../components/Icon'
 import ScaleCard from '../../components/ScaleCard'
+import searchIcon from '../../assets/figma/home-search.svg'
 import { searchScales, type Scale } from '../../data/scales'
 
 /**
@@ -33,7 +34,7 @@ export default function Search () {
     <View className='page search-page'>
       <Nav back className='search-nav'>
         <View className='search-input-wrap'>
-          <Icon name='search' className='search-input-icon' />
+          <Image src={searchIcon} className='search-input-icon' />
           <Input
             className='search-input'
             value={keyword}
@@ -59,13 +60,6 @@ export default function Search () {
                 </Text>
               ))}
             </View>
-          </View>
-        )}
-
-        {trimmed.length > 0 && (
-          <View className='list-head'>
-            <Text className='list-heading'>搜索结果</Text>
-            <Text className='list-head-count'>{results.length} 个评测</Text>
           </View>
         )}
 

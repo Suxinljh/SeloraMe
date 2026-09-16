@@ -19,9 +19,9 @@ $soft: #e6deff;
     margin-right: 4px;
 }
 .back {
-    width: 48px;
-    height: 48px;
-    padding: 10px;
+    width: 80px;
+    height: 80px;
+    padding: 20px;
 }
 .button-icon {
     width: 26px;
@@ -86,26 +86,21 @@ image {
     background: $bg;
     padding-bottom: 150px;
 }
+/* 状态栏占位：高度在 Nav 组件里按设备实测值内联覆盖，这里只是兜底 */
 .top-space {
-    height: 102px;
+    height: 86px;
 }
+/* 导航栏：min-height 在 Nav 组件里按原生导航栏高度内联覆盖（默认 85px 兜底）。
+   用 min-height 而非 height，页面写了更高的导航栏时仍能撑开。 */
 .nav {
-    height: 74px;
+    min-height: 85px;
     padding: 0 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #fff;
 }
 .nav.light {
     background: $bg;
-}
-.back {
-    width: 48px;
-    height: 48px;
-    font-size: 48px;
-    line-height: 43px;
-    color: #30324c;
 }
 .content {
     padding: 24px 32px;
@@ -764,8 +759,8 @@ image {
 .assessment-detail-favorite-icon {
     width: 26px;
     height: 26px;
-    filter: invert(25%) sepia(8%) saturate(1071%) hue-rotate(209deg)
-        brightness(91%) contrast(86%);
+    filter: invert(20%) sepia(30%) saturate(220%) hue-rotate(212deg)
+        brightness(130%);
 }
 .assessment-detail-favorite.is-favorite {
     background: #fff5d6;
@@ -1232,8 +1227,8 @@ image {
 .topics-icon .material-icon {
     width: 28px;
     height: 28px;
-    filter: invert(25%) sepia(8%) saturate(1071%) hue-rotate(209deg)
-        brightness(91%) contrast(86%);
+    filter: invert(20%) sepia(30%) saturate(220%) hue-rotate(212deg)
+        brightness(130%);
 }
 .topics-item-title,
 .topics-item-detail {
@@ -1362,7 +1357,6 @@ image {
     flex: 1;
     align-items: center;
     gap: 16px;
-    padding-right: 84px;
 }
 .profile-nav-avatar {
     display: flex;
@@ -1540,8 +1534,8 @@ image {
 .archive-item-icon .material-icon {
     width: 34px;
     height: 34px;
-    filter: invert(27%) sepia(70%) saturate(2188%) hue-rotate(232deg)
-        brightness(85%) contrast(89%);
+    filter: invert(20%) sepia(60%) saturate(2590%) hue-rotate(240deg)
+        brightness(110%);
 }
 .archive-item-title,
 .archive-item-detail {
@@ -2320,8 +2314,8 @@ image {
 // Figma icon tokens. Material SVGs are rendered through Image, so their fill is
 // colorized with a token-specific filter instead of inheriting text color.
 .material-icon {
-    filter: invert(25%) sepia(8%) saturate(1071%) hue-rotate(209deg)
-        brightness(91%) contrast(86%);
+    filter: invert(20%) sepia(30%) saturate(220%) hue-rotate(212deg)
+        brightness(130%);
 }
 .back {
     filter: invert(9%) sepia(7%) saturate(1329%) hue-rotate(206deg)
@@ -2342,8 +2336,8 @@ image {
 .profile-avatar-icon,
 .settings-account-icon,
 .logout-icon {
-    filter: invert(27%) sepia(70%) saturate(2188%) hue-rotate(232deg)
-        brightness(85%) contrast(89%);
+    filter: invert(20%) sepia(60%) saturate(2590%) hue-rotate(240deg)
+        brightness(110%);
 }
 .archive-icon {
     display: flex;
@@ -2371,8 +2365,8 @@ image {
 .service-icon-glyph {
     width: 28px;
     height: 28px;
-    filter: invert(25%) sepia(8%) saturate(1071%) hue-rotate(209deg)
-        brightness(91%) contrast(86%);
+    filter: invert(20%) sepia(30%) saturate(220%) hue-rotate(212deg)
+        brightness(130%);
 }
 .row-chevron,
 .option-chevron {
@@ -2388,15 +2382,15 @@ image {
 .quiz-prev .button-icon,
 .report-footer .button-icon,
 .report-meta .button-icon {
-    filter: invert(25%) sepia(8%) saturate(1071%) hue-rotate(209deg)
-        brightness(91%) contrast(86%);
+    filter: invert(20%) sepia(30%) saturate(220%) hue-rotate(212deg)
+        brightness(130%);
 }
 .report-footer .share .button-icon {
     filter: brightness(0) invert(1);
 }
 .purple-box .meaning-icon {
-    filter: invert(27%) sepia(70%) saturate(2188%) hue-rotate(232deg)
-        brightness(85%) contrast(89%);
+    filter: invert(20%) sepia(60%) saturate(2590%) hue-rotate(240deg)
+        brightness(110%);
 }
 .orange-box .meaning-icon {
     filter: invert(35%) sepia(86%) saturate(1073%) hue-rotate(356deg)
@@ -2853,10 +2847,9 @@ image {
     background: $bg;
 }
 
-/* 标题栏内的搜索输入框 */
+/* 标题栏内的搜索输入框。右侧为原生胶囊预留的宽度由 Nav 组件统一给出 */
 .search-nav {
     justify-content: flex-start;
-    gap: 16px;
 }
 .search-input-wrap {
     display: flex;
@@ -2864,15 +2857,15 @@ image {
     min-width: 0;
     align-items: center;
     gap: 12px;
-    height: 68px;
+    height: 64px;
     padding: 0 24px;
-    border-radius: 34px;
-    background: #f1ecf2;
+    border-radius: 16px;
+    background: #fff;
 }
 .search-input-icon {
     flex: none;
-    width: 36px;
-    height: 36px;
+    width: 24px;
+    height: 24px;
     filter: invert(51%) sepia(11%) saturate(552%) hue-rotate(212deg)
         brightness(89%) contrast(86%);
 }
@@ -3068,8 +3061,8 @@ image {
     flex: none;
     width: 36px;
     height: 36px;
-    filter: invert(27%) sepia(70%) saturate(2188%) hue-rotate(232deg)
-        brightness(85%) contrast(89%);
+    filter: invert(20%) sepia(60%) saturate(2590%) hue-rotate(240deg)
+        brightness(110%);
 }
 .unlock-rows {
     margin-top: 24px;
